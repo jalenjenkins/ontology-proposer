@@ -1,9 +1,11 @@
 from contextlib import contextmanager
 from math import isclose
+from pathlib import Path
+from tempfile import TemporaryDirectory
 
 import duckdb
 
-from ontology.data import cardinality, catalog, ident, open_db
+from ontology.data import cardinality, ident, open_db
 
 
 def source(metric, where=None, left=False):
@@ -96,19 +98,17 @@ def scoped(path, objects):
     for obj in objects:
         if obj["kind"] == "property":
             columns.setdefault(obj["table"], set()).add(obj["column"])
-    with open_db(path, True) as source_db, open_db(":memory:") as target:
-        source_types = {(t, c): dtype for t, c, dtype in catalog(source_db)}
-        for table, names in sorted(columns.items()):
-            names = sorted(names)
-            fields = ", ".join(ident(name) for name in names)
-            declarations = ", ".join(f"{ident(name)} {source_types[table, name]}" for name in names)
-            target.execute(f"create table {ident(table)} ({declarations})")
-            rows = source_db.execute(f"select {fields} from {ident(table)}")
-            vectors = ", ".join(f"unnest(?::{source_types[table, name]}[])" for name in names)
-            while batch := rows.fetchmany(4096):
-                target.execute(f"insert into {ident(table)} select {vectors}",
-                               [list(column) for column in zip(*batch)])
-        yield target
+    with TemporaryDirectory(prefix="ontology-role-") as folder:
+        projection = Path(folder) / "projection.duckdb"
+        source_path = str(Path(path).resolve()).replace("'", "''")
+        with duckdb.connect(str(projection), config={"threads": "2"}) as builder:
+            builder.execute(f"attach '{source_path}' as source_data (read_only)")
+            for table, names in sorted(columns.items()):
+                fields = ", ".join(ident(name) for name in sorted(names))
+                builder.execute(f"create table {ident(table)} as "
+                                f"select {fields} from source_data.main.{ident(table)}")
+        with open_db(projection, True) as session:
+            yield session
 
 
 def equivalent(a, b):
