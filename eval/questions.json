@@ -1,0 +1,162 @@
+[
+  {
+    "id": "q01",
+    "question": "How many patients?",
+    "gold_sql": "SELECT count(id) FROM patients"
+  },
+  {
+    "id": "q02",
+    "question": "How many patients with city Boston?",
+    "gold_sql": "SELECT count(id) FROM patients WHERE city = 'Boston'"
+  },
+  {
+    "id": "q03",
+    "question": "How many patients with city Salem?",
+    "gold_sql": "SELECT count(id) FROM patients WHERE city = 'Salem'"
+  },
+  {
+    "id": "q04",
+    "question": "How many patients with city Cambridge?",
+    "gold_sql": "SELECT count(id) FROM patients WHERE city = 'Cambridge'"
+  },
+  {
+    "id": "q05",
+    "question": "How many patients with gender F?",
+    "gold_sql": "SELECT count(id) FROM patients WHERE gender = 'F'"
+  },
+  {
+    "id": "q06",
+    "question": "How many patients with gender M?",
+    "gold_sql": "SELECT count(id) FROM patients WHERE gender = 'M'"
+  },
+  {
+    "id": "q07",
+    "question": "How many patients with gender X?",
+    "gold_sql": "SELECT count(id) FROM patients WHERE gender = 'X'"
+  },
+  {
+    "id": "q08",
+    "question": "How many encounters?",
+    "gold_sql": "SELECT count(id) FROM encounters"
+  },
+  {
+    "id": "q09",
+    "question": "How many encounters with encounterclass wellness?",
+    "gold_sql": "SELECT count(id) FROM encounters WHERE encounterclass = 'wellness'"
+  },
+  {
+    "id": "q10",
+    "question": "How many encounters with encounterclass ambulatory?",
+    "gold_sql": "SELECT count(id) FROM encounters WHERE encounterclass = 'ambulatory'"
+  },
+  {
+    "id": "q11",
+    "question": "How many encounters with encounterclass emergency?",
+    "gold_sql": "SELECT count(id) FROM encounters WHERE encounterclass = 'emergency'"
+  },
+  {
+    "id": "q12",
+    "question": "How many encounters with encounterclass inpatient?",
+    "gold_sql": "SELECT count(id) FROM encounters WHERE encounterclass = 'inpatient'"
+  },
+  {
+    "id": "q13",
+    "question": "How many claims?",
+    "gold_sql": "SELECT count(id) FROM claims"
+  },
+  {
+    "id": "q14",
+    "question": "How many claims with status paid?",
+    "gold_sql": "SELECT count(id) FROM claims WHERE status = 'paid'"
+  },
+  {
+    "id": "q15",
+    "question": "How many claims with status pending?",
+    "gold_sql": "SELECT count(id) FROM claims WHERE status = 'pending'"
+  },
+  {
+    "id": "q16",
+    "question": "How many claims with status denied?",
+    "gold_sql": "SELECT count(id) FROM claims WHERE status = 'denied'"
+  },
+  {
+    "id": "q17",
+    "question": "How many claims with status void?",
+    "gold_sql": "SELECT count(id) FROM claims WHERE status = 'void'"
+  },
+  {
+    "id": "q18",
+    "question": "What is the total claim cost?",
+    "gold_sql": "SELECT sum(cost) FROM claims"
+  },
+  {
+    "id": "q19",
+    "question": "What is the total claim cost with status paid?",
+    "gold_sql": "SELECT sum(cost) FROM claims WHERE status = 'paid'"
+  },
+  {
+    "id": "q20",
+    "question": "What is the total claim cost with status pending?",
+    "gold_sql": "SELECT sum(cost) FROM claims WHERE status = 'pending'"
+  },
+  {
+    "id": "q21",
+    "question": "What is the total claim cost with status denied?",
+    "gold_sql": "SELECT sum(cost) FROM claims WHERE status = 'denied'"
+  },
+  {
+    "id": "q22",
+    "question": "What is the total claim cost with status void?",
+    "gold_sql": "SELECT sum(cost) FROM claims WHERE status = 'void'"
+  },
+  {
+    "id": "q23",
+    "question": "What is the total claim cost with status closed?",
+    "gold_sql": "SELECT sum(cost) FROM claims WHERE status = 'closed'"
+  },
+  {
+    "id": "q24",
+    "question": "What is the total claim cost with status open?",
+    "gold_sql": "SELECT sum(cost) FROM claims WHERE status = 'open'"
+  },
+  {
+    "id": "q25",
+    "question": "What is the average claim cost?",
+    "gold_sql": "SELECT avg(cost) FROM claims"
+  },
+  {
+    "id": "q26",
+    "question": "What is the average claim cost with status paid?",
+    "gold_sql": "SELECT avg(cost) FROM claims WHERE status = 'paid'"
+  },
+  {
+    "id": "q27",
+    "question": "What is the average claim cost with status pending?",
+    "gold_sql": "SELECT avg(cost) FROM claims WHERE status = 'pending'"
+  },
+  {
+    "id": "q28",
+    "question": "What is the average claim cost with status denied?",
+    "gold_sql": "SELECT avg(cost) FROM claims WHERE status = 'denied'"
+  },
+  {
+    "id": "q29",
+    "question": "What is the average claim cost with status void?",
+    "gold_sql": "SELECT avg(cost) FROM claims WHERE status = 'void'"
+  },
+  {
+    "id": "q30",
+    "question": "What is the average claim cost with status closed?",
+    "gold_sql": "SELECT avg(cost) FROM claims WHERE status = 'closed'"
+  },
+  {
+    "id": "q31",
+    "question": "What is the average claim cost with status open?",
+    "gold_sql": "SELECT avg(cost) FROM claims WHERE status = 'open'"
+  },
+  {
+    "id": "q32",
+    "question": "What is the average claim cost with status review?",
+    "gold_sql": "SELECT avg(cost) FROM claims WHERE status = 'review'"
+  }
+]

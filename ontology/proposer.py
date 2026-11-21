@@ -91,7 +91,7 @@ def fixture_proposal(path):
                             roles=["admin"] if column == "private_note" else ["admin", "analyst"],
                             evidence=[c]))
     for j in data["joins"]:
-        if (j["column"], j["target"]) not in {("patient", "patients"), ("claim", "claims"), ("encounter", "encounters")}:
+        if j["target_column"] != "id" or (j["column"], j["target"]) not in {("patient", "patients"), ("claim", "claims"), ("encounter", "encounters")}:
             continue
         objects.append(dict(kind="join", name=f'{j["source"]}.{j["column"]}->{j["target"]}',
                             table=j["source"], target=j["target"], left=j["column"],
