@@ -1,0 +1,1230 @@
+{
+  "mode": "offline",
+  "dataset": "synthea",
+  "results": {
+    "schema_single": {
+      "correct": 24,
+      "total": 32,
+      "accuracy": 0.75,
+      "returned": 32,
+      "wrong_returned": 8,
+      "cases": [
+        {
+          "id": "s01",
+          "expected": 120,
+          "correct": true,
+          "status": "ok",
+          "value": 120,
+          "sql": "select count(*) from patients"
+        },
+        {
+          "id": "s02",
+          "expected": 10,
+          "correct": true,
+          "status": "ok",
+          "value": 10,
+          "sql": "select count(*) from patients where CITY='Boston'"
+        },
+        {
+          "id": "s03",
+          "expected": 8,
+          "correct": true,
+          "status": "ok",
+          "value": 8,
+          "sql": "select count(*) from patients where CITY='Waltham'"
+        },
+        {
+          "id": "s04",
+          "expected": 6,
+          "correct": true,
+          "status": "ok",
+          "value": 6,
+          "sql": "select count(*) from patients where CITY='Plymouth'"
+        },
+        {
+          "id": "s05",
+          "expected": 5,
+          "correct": true,
+          "status": "ok",
+          "value": 5,
+          "sql": "select count(*) from patients where CITY='Natick'"
+        },
+        {
+          "id": "s06",
+          "expected": 55,
+          "correct": true,
+          "status": "ok",
+          "value": 55,
+          "sql": "select count(*) from patients where GENDER='F'"
+        },
+        {
+          "id": "s07",
+          "expected": 65,
+          "correct": true,
+          "status": "ok",
+          "value": 65,
+          "sql": "select count(*) from patients where GENDER='M'"
+        },
+        {
+          "id": "s08",
+          "expected": 6762,
+          "correct": true,
+          "status": "ok",
+          "value": 6762,
+          "sql": "select count(*) from encounters"
+        },
+        {
+          "id": "s09",
+          "expected": 1511,
+          "correct": true,
+          "status": "ok",
+          "value": 1511,
+          "sql": "select count(*) from encounters where ENCOUNTERCLASS='wellness'"
+        },
+        {
+          "id": "s10",
+          "expected": 3147,
+          "correct": true,
+          "status": "ok",
+          "value": 3147,
+          "sql": "select count(*) from encounters where ENCOUNTERCLASS='ambulatory'"
+        },
+        {
+          "id": "s11",
+          "expected": 247,
+          "correct": true,
+          "status": "ok",
+          "value": 247,
+          "sql": "select count(*) from encounters where ENCOUNTERCLASS='emergency'"
+        },
+        {
+          "id": "s12",
+          "expected": 172,
+          "correct": true,
+          "status": "ok",
+          "value": 172,
+          "sql": "select count(*) from encounters where ENCOUNTERCLASS='inpatient'"
+        },
+        {
+          "id": "s13",
+          "expected": 1062,
+          "correct": true,
+          "status": "ok",
+          "value": 1062,
+          "sql": "select count(*) from encounters where ENCOUNTERCLASS='outpatient'"
+        },
+        {
+          "id": "s14",
+          "expected": 14816,
+          "correct": true,
+          "status": "ok",
+          "value": 14816,
+          "sql": "select count(*) from claims"
+        },
+        {
+          "id": "s15",
+          "expected": 14797,
+          "correct": true,
+          "status": "ok",
+          "value": 14797,
+          "sql": "select count(*) from claims where STATUS1='CLOSED'"
+        },
+        {
+          "id": "s16",
+          "expected": 19,
+          "correct": true,
+          "status": "ok",
+          "value": 19,
+          "sql": "select count(*) from claims where STATUS1='BILLED'"
+        },
+        {
+          "id": "s17",
+          "expected": 0,
+          "correct": true,
+          "status": "ok",
+          "value": 0,
+          "sql": "select count(*) from claims where STATUS1='PENDING'"
+        },
+        {
+          "id": "s18",
+          "expected": 23594852.520000383,
+          "correct": false,
+          "status": "ok",
+          "value": 1385833187.6201673,
+          "sql": "select sum(total_claim_cost) from encounters join claims_transactions on encounters.id = claims_transactions.appointmentid"
+        },
+        {
+          "id": "s19",
+          "expected": 1216058.5700000052,
+          "correct": false,
+          "status": "ok",
+          "value": 41717042.18000007,
+          "sql": "select sum(total_claim_cost) from encounters join claims_transactions on encounters.id = claims_transactions.appointmentid where ENCOUNTERCLASS='wellness'"
+        },
+        {
+          "id": "s20",
+          "expected": 11608853.100000136,
+          "correct": false,
+          "status": "ok",
+          "value": 321837770.2399633,
+          "sql": "select sum(total_claim_cost) from encounters join claims_transactions on encounters.id = claims_transactions.appointmentid where ENCOUNTERCLASS='ambulatory'"
+        },
+        {
+          "id": "s21",
+          "expected": 987320.7200000004,
+          "correct": false,
+          "status": "ok",
+          "value": 24659163.390000038,
+          "sql": "select sum(total_claim_cost) from encounters join claims_transactions on encounters.id = claims_transactions.appointmentid where ENCOUNTERCLASS='emergency'"
+        },
+        {
+          "id": "s22",
+          "expected": 7462034.859999997,
+          "correct": false,
+          "status": "ok",
+          "value": 840996482.1500177,
+          "sql": "select sum(total_claim_cost) from encounters join claims_transactions on encounters.id = claims_transactions.appointmentid where ENCOUNTERCLASS='inpatient'"
+        },
+        {
+          "id": "s23",
+          "expected": 1296189.9000000055,
+          "correct": false,
+          "status": "ok",
+          "value": 31338864.63999843,
+          "sql": "select sum(total_claim_cost) from encounters join claims_transactions on encounters.id = claims_transactions.appointmentid where ENCOUNTERCLASS='outpatient'"
+        },
+        {
+          "id": "s24",
+          "expected": 10436.17,
+          "correct": false,
+          "status": "ok",
+          "value": 289439.6000000002,
+          "sql": "select sum(total_claim_cost) from encounters join claims_transactions on encounters.id = claims_transactions.appointmentid where ENCOUNTERCLASS='virtual'"
+        },
+        {
+          "id": "s25",
+          "expected": 19299.13000000001,
+          "correct": false,
+          "status": "ok",
+          "value": 225759.89999999834,
+          "sql": "select sum(total_claim_cost) from encounters join claims_transactions on encounters.id = claims_transactions.appointmentid where ENCOUNTERCLASS='home'"
+        },
+        {
+          "id": "s26",
+          "expected": 3489.3304525288945,
+          "correct": true,
+          "status": "ok",
+          "value": 3489.3304525288945,
+          "sql": "select avg(total_claim_cost) from encounters"
+        },
+        {
+          "id": "s27",
+          "expected": 804.8038186631404,
+          "correct": true,
+          "status": "ok",
+          "value": 804.8038186631404,
+          "sql": "select avg(total_claim_cost) from encounters where ENCOUNTERCLASS='wellness'"
+        },
+        {
+          "id": "s28",
+          "expected": 3688.863393708337,
+          "correct": true,
+          "status": "ok",
+          "value": 3688.863393708337,
+          "sql": "select avg(total_claim_cost) from encounters where ENCOUNTERCLASS='ambulatory'"
+        },
+        {
+          "id": "s29",
+          "expected": 3997.249878542512,
+          "correct": true,
+          "status": "ok",
+          "value": 3997.249878542512,
+          "sql": "select avg(total_claim_cost) from encounters where ENCOUNTERCLASS='emergency'"
+        },
+        {
+          "id": "s30",
+          "expected": 43383.92360465114,
+          "correct": true,
+          "status": "ok",
+          "value": 43383.92360465114,
+          "sql": "select avg(total_claim_cost) from encounters where ENCOUNTERCLASS='inpatient'"
+        },
+        {
+          "id": "s31",
+          "expected": 1010.607229601515,
+          "correct": true,
+          "status": "ok",
+          "value": 1010.607229601515,
+          "sql": "select avg(total_claim_cost) from encounters where ENCOUNTERCLASS='urgentcare'"
+        },
+        {
+          "id": "s32",
+          "expected": 372.72035714285715,
+          "correct": true,
+          "status": "ok",
+          "value": 372.72035714285715,
+          "sql": "select avg(total_claim_cost) from encounters where ENCOUNTERCLASS='virtual'"
+        }
+      ]
+    },
+    "schema_verified": {
+      "correct": 24,
+      "total": 32,
+      "accuracy": 0.75,
+      "returned": 24,
+      "wrong_returned": 0,
+      "cases": [
+        {
+          "id": "s01",
+          "expected": 120,
+          "correct": true,
+          "status": "ok",
+          "value": 120,
+          "sql": "select count(*) from patients"
+        },
+        {
+          "id": "s02",
+          "expected": 10,
+          "correct": true,
+          "status": "ok",
+          "value": 10,
+          "sql": "select count(*) from patients where CITY='Boston'"
+        },
+        {
+          "id": "s03",
+          "expected": 8,
+          "correct": true,
+          "status": "ok",
+          "value": 8,
+          "sql": "select count(*) from patients where CITY='Waltham'"
+        },
+        {
+          "id": "s04",
+          "expected": 6,
+          "correct": true,
+          "status": "ok",
+          "value": 6,
+          "sql": "select count(*) from patients where CITY='Plymouth'"
+        },
+        {
+          "id": "s05",
+          "expected": 5,
+          "correct": true,
+          "status": "ok",
+          "value": 5,
+          "sql": "select count(*) from patients where CITY='Natick'"
+        },
+        {
+          "id": "s06",
+          "expected": 55,
+          "correct": true,
+          "status": "ok",
+          "value": 55,
+          "sql": "select count(*) from patients where GENDER='F'"
+        },
+        {
+          "id": "s07",
+          "expected": 65,
+          "correct": true,
+          "status": "ok",
+          "value": 65,
+          "sql": "select count(*) from patients where GENDER='M'"
+        },
+        {
+          "id": "s08",
+          "expected": 6762,
+          "correct": true,
+          "status": "ok",
+          "value": 6762,
+          "sql": "select count(*) from encounters"
+        },
+        {
+          "id": "s09",
+          "expected": 1511,
+          "correct": true,
+          "status": "ok",
+          "value": 1511,
+          "sql": "select count(*) from encounters where ENCOUNTERCLASS='wellness'"
+        },
+        {
+          "id": "s10",
+          "expected": 3147,
+          "correct": true,
+          "status": "ok",
+          "value": 3147,
+          "sql": "select count(*) from encounters where ENCOUNTERCLASS='ambulatory'"
+        },
+        {
+          "id": "s11",
+          "expected": 247,
+          "correct": true,
+          "status": "ok",
+          "value": 247,
+          "sql": "select count(*) from encounters where ENCOUNTERCLASS='emergency'"
+        },
+        {
+          "id": "s12",
+          "expected": 172,
+          "correct": true,
+          "status": "ok",
+          "value": 172,
+          "sql": "select count(*) from encounters where ENCOUNTERCLASS='inpatient'"
+        },
+        {
+          "id": "s13",
+          "expected": 1062,
+          "correct": true,
+          "status": "ok",
+          "value": 1062,
+          "sql": "select count(*) from encounters where ENCOUNTERCLASS='outpatient'"
+        },
+        {
+          "id": "s14",
+          "expected": 14816,
+          "correct": true,
+          "status": "ok",
+          "value": 14816,
+          "sql": "select count(*) from claims"
+        },
+        {
+          "id": "s15",
+          "expected": 14797,
+          "correct": true,
+          "status": "ok",
+          "value": 14797,
+          "sql": "select count(*) from claims where STATUS1='CLOSED'"
+        },
+        {
+          "id": "s16",
+          "expected": 19,
+          "correct": true,
+          "status": "ok",
+          "value": 19,
+          "sql": "select count(*) from claims where STATUS1='BILLED'"
+        },
+        {
+          "id": "s17",
+          "expected": 0,
+          "correct": true,
+          "status": "ok",
+          "value": 0,
+          "sql": "select count(*) from claims where STATUS1='PENDING'"
+        },
+        {
+          "id": "s18",
+          "expected": 23594852.520000383,
+          "correct": false,
+          "status": "disagreement",
+          "sql": "select sum(total_claim_cost) from encounters join claims_transactions on encounters.id = claims_transactions.appointmentid"
+        },
+        {
+          "id": "s19",
+          "expected": 1216058.5700000052,
+          "correct": false,
+          "status": "disagreement",
+          "sql": "select sum(total_claim_cost) from encounters join claims_transactions on encounters.id = claims_transactions.appointmentid where ENCOUNTERCLASS='wellness'"
+        },
+        {
+          "id": "s20",
+          "expected": 11608853.100000136,
+          "correct": false,
+          "status": "disagreement",
+          "sql": "select sum(total_claim_cost) from encounters join claims_transactions on encounters.id = claims_transactions.appointmentid where ENCOUNTERCLASS='ambulatory'"
+        },
+        {
+          "id": "s21",
+          "expected": 987320.7200000004,
+          "correct": false,
+          "status": "disagreement",
+          "sql": "select sum(total_claim_cost) from encounters join claims_transactions on encounters.id = claims_transactions.appointmentid where ENCOUNTERCLASS='emergency'"
+        },
+        {
+          "id": "s22",
+          "expected": 7462034.859999997,
+          "correct": false,
+          "status": "disagreement",
+          "sql": "select sum(total_claim_cost) from encounters join claims_transactions on encounters.id = claims_transactions.appointmentid where ENCOUNTERCLASS='inpatient'"
+        },
+        {
+          "id": "s23",
+          "expected": 1296189.9000000055,
+          "correct": false,
+          "status": "disagreement",
+          "sql": "select sum(total_claim_cost) from encounters join claims_transactions on encounters.id = claims_transactions.appointmentid where ENCOUNTERCLASS='outpatient'"
+        },
+        {
+          "id": "s24",
+          "expected": 10436.17,
+          "correct": false,
+          "status": "disagreement",
+          "sql": "select sum(total_claim_cost) from encounters join claims_transactions on encounters.id = claims_transactions.appointmentid where ENCOUNTERCLASS='virtual'"
+        },
+        {
+          "id": "s25",
+          "expected": 19299.13000000001,
+          "correct": false,
+          "status": "disagreement",
+          "sql": "select sum(total_claim_cost) from encounters join claims_transactions on encounters.id = claims_transactions.appointmentid where ENCOUNTERCLASS='home'"
+        },
+        {
+          "id": "s26",
+          "expected": 3489.3304525288945,
+          "correct": true,
+          "status": "ok",
+          "value": 3489.3304525288945,
+          "sql": "select avg(total_claim_cost) from encounters"
+        },
+        {
+          "id": "s27",
+          "expected": 804.8038186631404,
+          "correct": true,
+          "status": "ok",
+          "value": 804.8038186631404,
+          "sql": "select avg(total_claim_cost) from encounters where ENCOUNTERCLASS='wellness'"
+        },
+        {
+          "id": "s28",
+          "expected": 3688.863393708337,
+          "correct": true,
+          "status": "ok",
+          "value": 3688.863393708337,
+          "sql": "select avg(total_claim_cost) from encounters where ENCOUNTERCLASS='ambulatory'"
+        },
+        {
+          "id": "s29",
+          "expected": 3997.249878542512,
+          "correct": true,
+          "status": "ok",
+          "value": 3997.249878542512,
+          "sql": "select avg(total_claim_cost) from encounters where ENCOUNTERCLASS='emergency'"
+        },
+        {
+          "id": "s30",
+          "expected": 43383.92360465114,
+          "correct": true,
+          "status": "ok",
+          "value": 43383.92360465114,
+          "sql": "select avg(total_claim_cost) from encounters where ENCOUNTERCLASS='inpatient'"
+        },
+        {
+          "id": "s31",
+          "expected": 1010.607229601515,
+          "correct": true,
+          "status": "ok",
+          "value": 1010.607229601515,
+          "sql": "select avg(total_claim_cost) from encounters where ENCOUNTERCLASS='urgentcare'"
+        },
+        {
+          "id": "s32",
+          "expected": 372.72035714285715,
+          "correct": true,
+          "status": "ok",
+          "value": 372.72035714285715,
+          "sql": "select avg(total_claim_cost) from encounters where ENCOUNTERCLASS='virtual'"
+        }
+      ]
+    },
+    "ontology_single": {
+      "correct": 32,
+      "total": 32,
+      "accuracy": 1.0,
+      "returned": 32,
+      "wrong_returned": 0,
+      "cases": [
+        {
+          "id": "s01",
+          "expected": 120,
+          "correct": true,
+          "status": "ok",
+          "value": 120,
+          "sql": "select count(*) from \"patients\" b",
+          "params": []
+        },
+        {
+          "id": "s02",
+          "expected": 10,
+          "correct": true,
+          "status": "ok",
+          "value": 10,
+          "sql": "select count(*) from \"patients\" b where b.\"CITY\" = ?",
+          "params": [
+            "Boston"
+          ]
+        },
+        {
+          "id": "s03",
+          "expected": 8,
+          "correct": true,
+          "status": "ok",
+          "value": 8,
+          "sql": "select count(*) from \"patients\" b where b.\"CITY\" = ?",
+          "params": [
+            "Waltham"
+          ]
+        },
+        {
+          "id": "s04",
+          "expected": 6,
+          "correct": true,
+          "status": "ok",
+          "value": 6,
+          "sql": "select count(*) from \"patients\" b where b.\"CITY\" = ?",
+          "params": [
+            "Plymouth"
+          ]
+        },
+        {
+          "id": "s05",
+          "expected": 5,
+          "correct": true,
+          "status": "ok",
+          "value": 5,
+          "sql": "select count(*) from \"patients\" b where b.\"CITY\" = ?",
+          "params": [
+            "Natick"
+          ]
+        },
+        {
+          "id": "s06",
+          "expected": 55,
+          "correct": true,
+          "status": "ok",
+          "value": 55,
+          "sql": "select count(*) from \"patients\" b where b.\"GENDER\" = ?",
+          "params": [
+            "F"
+          ]
+        },
+        {
+          "id": "s07",
+          "expected": 65,
+          "correct": true,
+          "status": "ok",
+          "value": 65,
+          "sql": "select count(*) from \"patients\" b where b.\"GENDER\" = ?",
+          "params": [
+            "M"
+          ]
+        },
+        {
+          "id": "s08",
+          "expected": 6762,
+          "correct": true,
+          "status": "ok",
+          "value": 6762,
+          "sql": "select count(*) from \"encounters\" b",
+          "params": []
+        },
+        {
+          "id": "s09",
+          "expected": 1511,
+          "correct": true,
+          "status": "ok",
+          "value": 1511,
+          "sql": "select count(*) from \"encounters\" b where b.\"ENCOUNTERCLASS\" = ?",
+          "params": [
+            "wellness"
+          ]
+        },
+        {
+          "id": "s10",
+          "expected": 3147,
+          "correct": true,
+          "status": "ok",
+          "value": 3147,
+          "sql": "select count(*) from \"encounters\" b where b.\"ENCOUNTERCLASS\" = ?",
+          "params": [
+            "ambulatory"
+          ]
+        },
+        {
+          "id": "s11",
+          "expected": 247,
+          "correct": true,
+          "status": "ok",
+          "value": 247,
+          "sql": "select count(*) from \"encounters\" b where b.\"ENCOUNTERCLASS\" = ?",
+          "params": [
+            "emergency"
+          ]
+        },
+        {
+          "id": "s12",
+          "expected": 172,
+          "correct": true,
+          "status": "ok",
+          "value": 172,
+          "sql": "select count(*) from \"encounters\" b where b.\"ENCOUNTERCLASS\" = ?",
+          "params": [
+            "inpatient"
+          ]
+        },
+        {
+          "id": "s13",
+          "expected": 1062,
+          "correct": true,
+          "status": "ok",
+          "value": 1062,
+          "sql": "select count(*) from \"encounters\" b where b.\"ENCOUNTERCLASS\" = ?",
+          "params": [
+            "outpatient"
+          ]
+        },
+        {
+          "id": "s14",
+          "expected": 14816,
+          "correct": true,
+          "status": "ok",
+          "value": 14816,
+          "sql": "select count(*) from \"claims\" b",
+          "params": []
+        },
+        {
+          "id": "s15",
+          "expected": 14797,
+          "correct": true,
+          "status": "ok",
+          "value": 14797,
+          "sql": "select count(*) from \"claims\" b where b.\"STATUS1\" = ?",
+          "params": [
+            "CLOSED"
+          ]
+        },
+        {
+          "id": "s16",
+          "expected": 19,
+          "correct": true,
+          "status": "ok",
+          "value": 19,
+          "sql": "select count(*) from \"claims\" b where b.\"STATUS1\" = ?",
+          "params": [
+            "BILLED"
+          ]
+        },
+        {
+          "id": "s17",
+          "expected": 0,
+          "correct": true,
+          "status": "ok",
+          "value": 0,
+          "sql": "select count(*) from \"claims\" b where b.\"STATUS1\" = ?",
+          "params": [
+            "PENDING"
+          ]
+        },
+        {
+          "id": "s18",
+          "expected": 23594852.520000383,
+          "correct": true,
+          "status": "ok",
+          "value": 23594852.520000383,
+          "sql": "select sum(cast(b.\"TOTAL_CLAIM_COST\" as double)) from \"encounters\" b",
+          "params": []
+        },
+        {
+          "id": "s19",
+          "expected": 1216058.5700000052,
+          "correct": true,
+          "status": "ok",
+          "value": 1216058.5700000052,
+          "sql": "select sum(cast(b.\"TOTAL_CLAIM_COST\" as double)) from \"encounters\" b where b.\"ENCOUNTERCLASS\" = ?",
+          "params": [
+            "wellness"
+          ]
+        },
+        {
+          "id": "s20",
+          "expected": 11608853.100000136,
+          "correct": true,
+          "status": "ok",
+          "value": 11608853.100000136,
+          "sql": "select sum(cast(b.\"TOTAL_CLAIM_COST\" as double)) from \"encounters\" b where b.\"ENCOUNTERCLASS\" = ?",
+          "params": [
+            "ambulatory"
+          ]
+        },
+        {
+          "id": "s21",
+          "expected": 987320.7200000004,
+          "correct": true,
+          "status": "ok",
+          "value": 987320.7200000004,
+          "sql": "select sum(cast(b.\"TOTAL_CLAIM_COST\" as double)) from \"encounters\" b where b.\"ENCOUNTERCLASS\" = ?",
+          "params": [
+            "emergency"
+          ]
+        },
+        {
+          "id": "s22",
+          "expected": 7462034.859999997,
+          "correct": true,
+          "status": "ok",
+          "value": 7462034.859999997,
+          "sql": "select sum(cast(b.\"TOTAL_CLAIM_COST\" as double)) from \"encounters\" b where b.\"ENCOUNTERCLASS\" = ?",
+          "params": [
+            "inpatient"
+          ]
+        },
+        {
+          "id": "s23",
+          "expected": 1296189.9000000055,
+          "correct": true,
+          "status": "ok",
+          "value": 1296189.9000000055,
+          "sql": "select sum(cast(b.\"TOTAL_CLAIM_COST\" as double)) from \"encounters\" b where b.\"ENCOUNTERCLASS\" = ?",
+          "params": [
+            "outpatient"
+          ]
+        },
+        {
+          "id": "s24",
+          "expected": 10436.17,
+          "correct": true,
+          "status": "ok",
+          "value": 10436.17,
+          "sql": "select sum(cast(b.\"TOTAL_CLAIM_COST\" as double)) from \"encounters\" b where b.\"ENCOUNTERCLASS\" = ?",
+          "params": [
+            "virtual"
+          ]
+        },
+        {
+          "id": "s25",
+          "expected": 19299.13000000001,
+          "correct": true,
+          "status": "ok",
+          "value": 19299.13000000001,
+          "sql": "select sum(cast(b.\"TOTAL_CLAIM_COST\" as double)) from \"encounters\" b where b.\"ENCOUNTERCLASS\" = ?",
+          "params": [
+            "home"
+          ]
+        },
+        {
+          "id": "s26",
+          "expected": 3489.3304525288945,
+          "correct": true,
+          "status": "ok",
+          "value": 3489.3304525288945,
+          "sql": "select avg(cast(b.\"TOTAL_CLAIM_COST\" as double)) from \"encounters\" b",
+          "params": []
+        },
+        {
+          "id": "s27",
+          "expected": 804.8038186631404,
+          "correct": true,
+          "status": "ok",
+          "value": 804.8038186631404,
+          "sql": "select avg(cast(b.\"TOTAL_CLAIM_COST\" as double)) from \"encounters\" b where b.\"ENCOUNTERCLASS\" = ?",
+          "params": [
+            "wellness"
+          ]
+        },
+        {
+          "id": "s28",
+          "expected": 3688.863393708337,
+          "correct": true,
+          "status": "ok",
+          "value": 3688.863393708337,
+          "sql": "select avg(cast(b.\"TOTAL_CLAIM_COST\" as double)) from \"encounters\" b where b.\"ENCOUNTERCLASS\" = ?",
+          "params": [
+            "ambulatory"
+          ]
+        },
+        {
+          "id": "s29",
+          "expected": 3997.249878542512,
+          "correct": true,
+          "status": "ok",
+          "value": 3997.249878542512,
+          "sql": "select avg(cast(b.\"TOTAL_CLAIM_COST\" as double)) from \"encounters\" b where b.\"ENCOUNTERCLASS\" = ?",
+          "params": [
+            "emergency"
+          ]
+        },
+        {
+          "id": "s30",
+          "expected": 43383.92360465114,
+          "correct": true,
+          "status": "ok",
+          "value": 43383.92360465114,
+          "sql": "select avg(cast(b.\"TOTAL_CLAIM_COST\" as double)) from \"encounters\" b where b.\"ENCOUNTERCLASS\" = ?",
+          "params": [
+            "inpatient"
+          ]
+        },
+        {
+          "id": "s31",
+          "expected": 1010.607229601515,
+          "correct": true,
+          "status": "ok",
+          "value": 1010.607229601515,
+          "sql": "select avg(cast(b.\"TOTAL_CLAIM_COST\" as double)) from \"encounters\" b where b.\"ENCOUNTERCLASS\" = ?",
+          "params": [
+            "urgentcare"
+          ]
+        },
+        {
+          "id": "s32",
+          "expected": 372.72035714285715,
+          "correct": true,
+          "status": "ok",
+          "value": 372.72035714285715,
+          "sql": "select avg(cast(b.\"TOTAL_CLAIM_COST\" as double)) from \"encounters\" b where b.\"ENCOUNTERCLASS\" = ?",
+          "params": [
+            "virtual"
+          ]
+        }
+      ]
+    },
+    "ontology_verified": {
+      "correct": 32,
+      "total": 32,
+      "accuracy": 1.0,
+      "returned": 32,
+      "wrong_returned": 0,
+      "cases": [
+        {
+          "id": "s01",
+          "expected": 120,
+          "correct": true,
+          "status": "ok",
+          "value": 120,
+          "sql": "select count(*) from \"patients\" b",
+          "params": []
+        },
+        {
+          "id": "s02",
+          "expected": 10,
+          "correct": true,
+          "status": "ok",
+          "value": 10,
+          "sql": "select count(*) from \"patients\" b where b.\"CITY\" = ?",
+          "params": [
+            "Boston"
+          ]
+        },
+        {
+          "id": "s03",
+          "expected": 8,
+          "correct": true,
+          "status": "ok",
+          "value": 8,
+          "sql": "select count(*) from \"patients\" b where b.\"CITY\" = ?",
+          "params": [
+            "Waltham"
+          ]
+        },
+        {
+          "id": "s04",
+          "expected": 6,
+          "correct": true,
+          "status": "ok",
+          "value": 6,
+          "sql": "select count(*) from \"patients\" b where b.\"CITY\" = ?",
+          "params": [
+            "Plymouth"
+          ]
+        },
+        {
+          "id": "s05",
+          "expected": 5,
+          "correct": true,
+          "status": "ok",
+          "value": 5,
+          "sql": "select count(*) from \"patients\" b where b.\"CITY\" = ?",
+          "params": [
+            "Natick"
+          ]
+        },
+        {
+          "id": "s06",
+          "expected": 55,
+          "correct": true,
+          "status": "ok",
+          "value": 55,
+          "sql": "select count(*) from \"patients\" b where b.\"GENDER\" = ?",
+          "params": [
+            "F"
+          ]
+        },
+        {
+          "id": "s07",
+          "expected": 65,
+          "correct": true,
+          "status": "ok",
+          "value": 65,
+          "sql": "select count(*) from \"patients\" b where b.\"GENDER\" = ?",
+          "params": [
+            "M"
+          ]
+        },
+        {
+          "id": "s08",
+          "expected": 6762,
+          "correct": true,
+          "status": "ok",
+          "value": 6762,
+          "sql": "select count(*) from \"encounters\" b",
+          "params": []
+        },
+        {
+          "id": "s09",
+          "expected": 1511,
+          "correct": true,
+          "status": "ok",
+          "value": 1511,
+          "sql": "select count(*) from \"encounters\" b where b.\"ENCOUNTERCLASS\" = ?",
+          "params": [
+            "wellness"
+          ]
+        },
+        {
+          "id": "s10",
+          "expected": 3147,
+          "correct": true,
+          "status": "ok",
+          "value": 3147,
+          "sql": "select count(*) from \"encounters\" b where b.\"ENCOUNTERCLASS\" = ?",
+          "params": [
+            "ambulatory"
+          ]
+        },
+        {
+          "id": "s11",
+          "expected": 247,
+          "correct": true,
+          "status": "ok",
+          "value": 247,
+          "sql": "select count(*) from \"encounters\" b where b.\"ENCOUNTERCLASS\" = ?",
+          "params": [
+            "emergency"
+          ]
+        },
+        {
+          "id": "s12",
+          "expected": 172,
+          "correct": true,
+          "status": "ok",
+          "value": 172,
+          "sql": "select count(*) from \"encounters\" b where b.\"ENCOUNTERCLASS\" = ?",
+          "params": [
+            "inpatient"
+          ]
+        },
+        {
+          "id": "s13",
+          "expected": 1062,
+          "correct": true,
+          "status": "ok",
+          "value": 1062,
+          "sql": "select count(*) from \"encounters\" b where b.\"ENCOUNTERCLASS\" = ?",
+          "params": [
+            "outpatient"
+          ]
+        },
+        {
+          "id": "s14",
+          "expected": 14816,
+          "correct": true,
+          "status": "ok",
+          "value": 14816,
+          "sql": "select count(*) from \"claims\" b",
+          "params": []
+        },
+        {
+          "id": "s15",
+          "expected": 14797,
+          "correct": true,
+          "status": "ok",
+          "value": 14797,
+          "sql": "select count(*) from \"claims\" b where b.\"STATUS1\" = ?",
+          "params": [
+            "CLOSED"
+          ]
+        },
+        {
+          "id": "s16",
+          "expected": 19,
+          "correct": true,
+          "status": "ok",
+          "value": 19,
+          "sql": "select count(*) from \"claims\" b where b.\"STATUS1\" = ?",
+          "params": [
+            "BILLED"
+          ]
+        },
+        {
+          "id": "s17",
+          "expected": 0,
+          "correct": true,
+          "status": "ok",
+          "value": 0,
+          "sql": "select count(*) from \"claims\" b where b.\"STATUS1\" = ?",
+          "params": [
+            "PENDING"
+          ]
+        },
+        {
+          "id": "s18",
+          "expected": 23594852.520000383,
+          "correct": true,
+          "status": "ok",
+          "value": 23594852.520000383,
+          "sql": "select sum(cast(b.\"TOTAL_CLAIM_COST\" as double)) from \"encounters\" b",
+          "params": []
+        },
+        {
+          "id": "s19",
+          "expected": 1216058.5700000052,
+          "correct": true,
+          "status": "ok",
+          "value": 1216058.5700000052,
+          "sql": "select sum(cast(b.\"TOTAL_CLAIM_COST\" as double)) from \"encounters\" b where b.\"ENCOUNTERCLASS\" = ?",
+          "params": [
+            "wellness"
+          ]
+        },
+        {
+          "id": "s20",
+          "expected": 11608853.100000136,
+          "correct": true,
+          "status": "ok",
+          "value": 11608853.100000136,
+          "sql": "select sum(cast(b.\"TOTAL_CLAIM_COST\" as double)) from \"encounters\" b where b.\"ENCOUNTERCLASS\" = ?",
+          "params": [
+            "ambulatory"
+          ]
+        },
+        {
+          "id": "s21",
+          "expected": 987320.7200000004,
+          "correct": true,
+          "status": "ok",
+          "value": 987320.7200000004,
+          "sql": "select sum(cast(b.\"TOTAL_CLAIM_COST\" as double)) from \"encounters\" b where b.\"ENCOUNTERCLASS\" = ?",
+          "params": [
+            "emergency"
+          ]
+        },
+        {
+          "id": "s22",
+          "expected": 7462034.859999997,
+          "correct": true,
+          "status": "ok",
+          "value": 7462034.859999997,
+          "sql": "select sum(cast(b.\"TOTAL_CLAIM_COST\" as double)) from \"encounters\" b where b.\"ENCOUNTERCLASS\" = ?",
+          "params": [
+            "inpatient"
+          ]
+        },
+        {
+          "id": "s23",
+          "expected": 1296189.9000000055,
+          "correct": true,
+          "status": "ok",
+          "value": 1296189.9000000055,
+          "sql": "select sum(cast(b.\"TOTAL_CLAIM_COST\" as double)) from \"encounters\" b where b.\"ENCOUNTERCLASS\" = ?",
+          "params": [
+            "outpatient"
+          ]
+        },
+        {
+          "id": "s24",
+          "expected": 10436.17,
+          "correct": true,
+          "status": "ok",
+          "value": 10436.17,
+          "sql": "select sum(cast(b.\"TOTAL_CLAIM_COST\" as double)) from \"encounters\" b where b.\"ENCOUNTERCLASS\" = ?",
+          "params": [
+            "virtual"
+          ]
+        },
+        {
+          "id": "s25",
+          "expected": 19299.13000000001,
+          "correct": true,
+          "status": "ok",
+          "value": 19299.13000000001,
+          "sql": "select sum(cast(b.\"TOTAL_CLAIM_COST\" as double)) from \"encounters\" b where b.\"ENCOUNTERCLASS\" = ?",
+          "params": [
+            "home"
+          ]
+        },
+        {
+          "id": "s26",
+          "expected": 3489.3304525288945,
+          "correct": true,
+          "status": "ok",
+          "value": 3489.3304525288945,
+          "sql": "select avg(cast(b.\"TOTAL_CLAIM_COST\" as double)) from \"encounters\" b",
+          "params": []
+        },
+        {
+          "id": "s27",
+          "expected": 804.8038186631404,
+          "correct": true,
+          "status": "ok",
+          "value": 804.8038186631404,
+          "sql": "select avg(cast(b.\"TOTAL_CLAIM_COST\" as double)) from \"encounters\" b where b.\"ENCOUNTERCLASS\" = ?",
+          "params": [
+            "wellness"
+          ]
+        },
+        {
+          "id": "s28",
+          "expected": 3688.863393708337,
+          "correct": true,
+          "status": "ok",
+          "value": 3688.863393708337,
+          "sql": "select avg(cast(b.\"TOTAL_CLAIM_COST\" as double)) from \"encounters\" b where b.\"ENCOUNTERCLASS\" = ?",
+          "params": [
+            "ambulatory"
+          ]
+        },
+        {
+          "id": "s29",
+          "expected": 3997.249878542512,
+          "correct": true,
+          "status": "ok",
+          "value": 3997.249878542512,
+          "sql": "select avg(cast(b.\"TOTAL_CLAIM_COST\" as double)) from \"encounters\" b where b.\"ENCOUNTERCLASS\" = ?",
+          "params": [
+            "emergency"
+          ]
+        },
+        {
+          "id": "s30",
+          "expected": 43383.92360465114,
+          "correct": true,
+          "status": "ok",
+          "value": 43383.92360465114,
+          "sql": "select avg(cast(b.\"TOTAL_CLAIM_COST\" as double)) from \"encounters\" b where b.\"ENCOUNTERCLASS\" = ?",
+          "params": [
+            "inpatient"
+          ]
+        },
+        {
+          "id": "s31",
+          "expected": 1010.607229601515,
+          "correct": true,
+          "status": "ok",
+          "value": 1010.607229601515,
+          "sql": "select avg(cast(b.\"TOTAL_CLAIM_COST\" as double)) from \"encounters\" b where b.\"ENCOUNTERCLASS\" = ?",
+          "params": [
+            "urgentcare"
+          ]
+        },
+        {
+          "id": "s32",
+          "expected": 372.72035714285715,
+          "correct": true,
+          "status": "ok",
+          "value": 372.72035714285715,
+          "sql": "select avg(cast(b.\"TOTAL_CLAIM_COST\" as double)) from \"encounters\" b where b.\"ENCOUNTERCLASS\" = ?",
+          "params": [
+            "virtual"
+          ]
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,1235 @@
+{
+  "mode": "offline",
+  "dataset": "fixture",
+  "results": {
+    "schema_single": {
+      "correct": 29,
+      "total": 32,
+      "accuracy": 0.90625,
+      "returned": 32,
+      "wrong_returned": 3,
+      "cases": [
+        {
+          "id": "q01",
+          "expected": 12,
+          "correct": true,
+          "status": "ok",
+          "value": 12,
+          "sql": "select count(*) from patients"
+        },
+        {
+          "id": "q02",
+          "expected": 6,
+          "correct": true,
+          "status": "ok",
+          "value": 6,
+          "sql": "select count(*) from patients where city='Boston'"
+        },
+        {
+          "id": "q03",
+          "expected": 6,
+          "correct": true,
+          "status": "ok",
+          "value": 6,
+          "sql": "select count(*) from patients where city='Salem'"
+        },
+        {
+          "id": "q04",
+          "expected": 0,
+          "correct": true,
+          "status": "ok",
+          "value": 0,
+          "sql": "select count(*) from patients where city='Cambridge'"
+        },
+        {
+          "id": "q05",
+          "expected": 4,
+          "correct": true,
+          "status": "ok",
+          "value": 4,
+          "sql": "select count(*) from patients where gender='F'"
+        },
+        {
+          "id": "q06",
+          "expected": 8,
+          "correct": true,
+          "status": "ok",
+          "value": 8,
+          "sql": "select count(*) from patients where gender='M'"
+        },
+        {
+          "id": "q07",
+          "expected": 0,
+          "correct": true,
+          "status": "ok",
+          "value": 0,
+          "sql": "select count(*) from patients where gender='X'"
+        },
+        {
+          "id": "q08",
+          "expected": 24,
+          "correct": true,
+          "status": "ok",
+          "value": 24,
+          "sql": "select count(*) from encounters"
+        },
+        {
+          "id": "q09",
+          "expected": 12,
+          "correct": true,
+          "status": "ok",
+          "value": 12,
+          "sql": "select count(*) from encounters where encounterclass='wellness'"
+        },
+        {
+          "id": "q10",
+          "expected": 12,
+          "correct": true,
+          "status": "ok",
+          "value": 12,
+          "sql": "select count(*) from encounters where encounterclass='ambulatory'"
+        },
+        {
+          "id": "q11",
+          "expected": 0,
+          "correct": true,
+          "status": "ok",
+          "value": 0,
+          "sql": "select count(*) from encounters where encounterclass='emergency'"
+        },
+        {
+          "id": "q12",
+          "expected": 0,
+          "correct": true,
+          "status": "ok",
+          "value": 0,
+          "sql": "select count(*) from encounters where encounterclass='inpatient'"
+        },
+        {
+          "id": "q13",
+          "expected": 16,
+          "correct": true,
+          "status": "ok",
+          "value": 16,
+          "sql": "select count(*) from claims"
+        },
+        {
+          "id": "q14",
+          "expected": 8,
+          "correct": true,
+          "status": "ok",
+          "value": 8,
+          "sql": "select count(*) from claims where status='paid'"
+        },
+        {
+          "id": "q15",
+          "expected": 8,
+          "correct": true,
+          "status": "ok",
+          "value": 8,
+          "sql": "select count(*) from claims where status='pending'"
+        },
+        {
+          "id": "q16",
+          "expected": 0,
+          "correct": true,
+          "status": "ok",
+          "value": 0,
+          "sql": "select count(*) from claims where status='denied'"
+        },
+        {
+          "id": "q17",
+          "expected": 0,
+          "correct": true,
+          "status": "ok",
+          "value": 0,
+          "sql": "select count(*) from claims where status='void'"
+        },
+        {
+          "id": "q18",
+          "expected": 1400,
+          "correct": false,
+          "status": "ok",
+          "value": 2875,
+          "sql": "select sum(cost) from claims join claim_lines on claims.id = claim_lines.claim"
+        },
+        {
+          "id": "q19",
+          "expected": 600,
+          "correct": false,
+          "status": "ok",
+          "value": 1200,
+          "sql": "select sum(cost) from claims join claim_lines on claims.id = claim_lines.claim where status='paid'"
+        },
+        {
+          "id": "q20",
+          "expected": 800,
+          "correct": false,
+          "status": "ok",
+          "value": 1675,
+          "sql": "select sum(cost) from claims join claim_lines on claims.id = claim_lines.claim where status='pending'"
+        },
+        {
+          "id": "q21",
+          "expected": null,
+          "correct": true,
+          "status": "ok",
+          "value": null,
+          "sql": "select sum(cost) from claims join claim_lines on claims.id = claim_lines.claim where status='denied'"
+        },
+        {
+          "id": "q22",
+          "expected": null,
+          "correct": true,
+          "status": "ok",
+          "value": null,
+          "sql": "select sum(cost) from claims join claim_lines on claims.id = claim_lines.claim where status='void'"
+        },
+        {
+          "id": "q23",
+          "expected": null,
+          "correct": true,
+          "status": "ok",
+          "value": null,
+          "sql": "select sum(cost) from claims join claim_lines on claims.id = claim_lines.claim where status='closed'"
+        },
+        {
+          "id": "q24",
+          "expected": null,
+          "correct": true,
+          "status": "ok",
+          "value": null,
+          "sql": "select sum(cost) from claims join claim_lines on claims.id = claim_lines.claim where status='open'"
+        },
+        {
+          "id": "q25",
+          "expected": 87.5,
+          "correct": true,
+          "status": "ok",
+          "value": 87.5,
+          "sql": "select avg(cost) from claims"
+        },
+        {
+          "id": "q26",
+          "expected": 75.0,
+          "correct": true,
+          "status": "ok",
+          "value": 75.0,
+          "sql": "select avg(cost) from claims where status='paid'"
+        },
+        {
+          "id": "q27",
+          "expected": 100.0,
+          "correct": true,
+          "status": "ok",
+          "value": 100.0,
+          "sql": "select avg(cost) from claims where status='pending'"
+        },
+        {
+          "id": "q28",
+          "expected": null,
+          "correct": true,
+          "status": "ok",
+          "value": null,
+          "sql": "select avg(cost) from claims where status='denied'"
+        },
+        {
+          "id": "q29",
+          "expected": null,
+          "correct": true,
+          "status": "ok",
+          "value": null,
+          "sql": "select avg(cost) from claims where status='void'"
+        },
+        {
+          "id": "q30",
+          "expected": null,
+          "correct": true,
+          "status": "ok",
+          "value": null,
+          "sql": "select avg(cost) from claims where status='closed'"
+        },
+        {
+          "id": "q31",
+          "expected": null,
+          "correct": true,
+          "status": "ok",
+          "value": null,
+          "sql": "select avg(cost) from claims where status='open'"
+        },
+        {
+          "id": "q32",
+          "expected": null,
+          "correct": true,
+          "status": "ok",
+          "value": null,
+          "sql": "select avg(cost) from claims where status='review'"
+        }
+      ]
+    },
+    "schema_verified": {
+      "correct": 29,
+      "total": 32,
+      "accuracy": 0.90625,
+      "returned": 29,
+      "wrong_returned": 0,
+      "cases": [
+        {
+          "id": "q01",
+          "expected": 12,
+          "correct": true,
+          "status": "ok",
+          "value": 12,
+          "sql": "select count(*) from patients"
+        },
+        {
+          "id": "q02",
+          "expected": 6,
+          "correct": true,
+          "status": "ok",
+          "value": 6,
+          "sql": "select count(*) from patients where city='Boston'"
+        },
+        {
+          "id": "q03",
+          "expected": 6,
+          "correct": true,
+          "status": "ok",
+          "value": 6,
+          "sql": "select count(*) from patients where city='Salem'"
+        },
+        {
+          "id": "q04",
+          "expected": 0,
+          "correct": true,
+          "status": "ok",
+          "value": 0,
+          "sql": "select count(*) from patients where city='Cambridge'"
+        },
+        {
+          "id": "q05",
+          "expected": 4,
+          "correct": true,
+          "status": "ok",
+          "value": 4,
+          "sql": "select count(*) from patients where gender='F'"
+        },
+        {
+          "id": "q06",
+          "expected": 8,
+          "correct": true,
+          "status": "ok",
+          "value": 8,
+          "sql": "select count(*) from patients where gender='M'"
+        },
+        {
+          "id": "q07",
+          "expected": 0,
+          "correct": true,
+          "status": "ok",
+          "value": 0,
+          "sql": "select count(*) from patients where gender='X'"
+        },
+        {
+          "id": "q08",
+          "expected": 24,
+          "correct": true,
+          "status": "ok",
+          "value": 24,
+          "sql": "select count(*) from encounters"
+        },
+        {
+          "id": "q09",
+          "expected": 12,
+          "correct": true,
+          "status": "ok",
+          "value": 12,
+          "sql": "select count(*) from encounters where encounterclass='wellness'"
+        },
+        {
+          "id": "q10",
+          "expected": 12,
+          "correct": true,
+          "status": "ok",
+          "value": 12,
+          "sql": "select count(*) from encounters where encounterclass='ambulatory'"
+        },
+        {
+          "id": "q11",
+          "expected": 0,
+          "correct": true,
+          "status": "ok",
+          "value": 0,
+          "sql": "select count(*) from encounters where encounterclass='emergency'"
+        },
+        {
+          "id": "q12",
+          "expected": 0,
+          "correct": true,
+          "status": "ok",
+          "value": 0,
+          "sql": "select count(*) from encounters where encounterclass='inpatient'"
+        },
+        {
+          "id": "q13",
+          "expected": 16,
+          "correct": true,
+          "status": "ok",
+          "value": 16,
+          "sql": "select count(*) from claims"
+        },
+        {
+          "id": "q14",
+          "expected": 8,
+          "correct": true,
+          "status": "ok",
+          "value": 8,
+          "sql": "select count(*) from claims where status='paid'"
+        },
+        {
+          "id": "q15",
+          "expected": 8,
+          "correct": true,
+          "status": "ok",
+          "value": 8,
+          "sql": "select count(*) from claims where status='pending'"
+        },
+        {
+          "id": "q16",
+          "expected": 0,
+          "correct": true,
+          "status": "ok",
+          "value": 0,
+          "sql": "select count(*) from claims where status='denied'"
+        },
+        {
+          "id": "q17",
+          "expected": 0,
+          "correct": true,
+          "status": "ok",
+          "value": 0,
+          "sql": "select count(*) from claims where status='void'"
+        },
+        {
+          "id": "q18",
+          "expected": 1400,
+          "correct": false,
+          "status": "disagreement",
+          "sql": "select sum(cost) from claims join claim_lines on claims.id = claim_lines.claim"
+        },
+        {
+          "id": "q19",
+          "expected": 600,
+          "correct": false,
+          "status": "disagreement",
+          "sql": "select sum(cost) from claims join claim_lines on claims.id = claim_lines.claim where status='paid'"
+        },
+        {
+          "id": "q20",
+          "expected": 800,
+          "correct": false,
+          "status": "disagreement",
+          "sql": "select sum(cost) from claims join claim_lines on claims.id = claim_lines.claim where status='pending'"
+        },
+        {
+          "id": "q21",
+          "expected": null,
+          "correct": true,
+          "status": "ok",
+          "value": null,
+          "sql": "select sum(cost) from claims join claim_lines on claims.id = claim_lines.claim where status='denied'"
+        },
+        {
+          "id": "q22",
+          "expected": null,
+          "correct": true,
+          "status": "ok",
+          "value": null,
+          "sql": "select sum(cost) from claims join claim_lines on claims.id = claim_lines.claim where status='void'"
+        },
+        {
+          "id": "q23",
+          "expected": null,
+          "correct": true,
+          "status": "ok",
+          "value": null,
+          "sql": "select sum(cost) from claims join claim_lines on claims.id = claim_lines.claim where status='closed'"
+        },
+        {
+          "id": "q24",
+          "expected": null,
+          "correct": true,
+          "status": "ok",
+          "value": null,
+          "sql": "select sum(cost) from claims join claim_lines on claims.id = claim_lines.claim where status='open'"
+        },
+        {
+          "id": "q25",
+          "expected": 87.5,
+          "correct": true,
+          "status": "ok",
+          "value": 87.5,
+          "sql": "select avg(cost) from claims"
+        },
+        {
+          "id": "q26",
+          "expected": 75.0,
+          "correct": true,
+          "status": "ok",
+          "value": 75.0,
+          "sql": "select avg(cost) from claims where status='paid'"
+        },
+        {
+          "id": "q27",
+          "expected": 100.0,
+          "correct": true,
+          "status": "ok",
+          "value": 100.0,
+          "sql": "select avg(cost) from claims where status='pending'"
+        },
+        {
+          "id": "q28",
+          "expected": null,
+          "correct": true,
+          "status": "ok",
+          "value": null,
+          "sql": "select avg(cost) from claims where status='denied'"
+        },
+        {
+          "id": "q29",
+          "expected": null,
+          "correct": true,
+          "status": "ok",
+          "value": null,
+          "sql": "select avg(cost) from claims where status='void'"
+        },
+        {
+          "id": "q30",
+          "expected": null,
+          "correct": true,
+          "status": "ok",
+          "value": null,
+          "sql": "select avg(cost) from claims where status='closed'"
+        },
+        {
+          "id": "q31",
+          "expected": null,
+          "correct": true,
+          "status": "ok",
+          "value": null,
+          "sql": "select avg(cost) from claims where status='open'"
+        },
+        {
+          "id": "q32",
+          "expected": null,
+          "correct": true,
+          "status": "ok",
+          "value": null,
+          "sql": "select avg(cost) from claims where status='review'"
+        }
+      ]
+    },
+    "ontology_single": {
+      "correct": 32,
+      "total": 32,
+      "accuracy": 1.0,
+      "returned": 32,
+      "wrong_returned": 0,
+      "cases": [
+        {
+          "id": "q01",
+          "expected": 12,
+          "correct": true,
+          "status": "ok",
+          "value": 12,
+          "sql": "select count(*) from \"patients\" b",
+          "params": []
+        },
+        {
+          "id": "q02",
+          "expected": 6,
+          "correct": true,
+          "status": "ok",
+          "value": 6,
+          "sql": "select count(*) from \"patients\" b where b.\"city\" = ?",
+          "params": [
+            "Boston"
+          ]
+        },
+        {
+          "id": "q03",
+          "expected": 6,
+          "correct": true,
+          "status": "ok",
+          "value": 6,
+          "sql": "select count(*) from \"patients\" b where b.\"city\" = ?",
+          "params": [
+            "Salem"
+          ]
+        },
+        {
+          "id": "q04",
+          "expected": 0,
+          "correct": true,
+          "status": "ok",
+          "value": 0,
+          "sql": "select count(*) from \"patients\" b where b.\"city\" = ?",
+          "params": [
+            "Cambridge"
+          ]
+        },
+        {
+          "id": "q05",
+          "expected": 4,
+          "correct": true,
+          "status": "ok",
+          "value": 4,
+          "sql": "select count(*) from \"patients\" b where b.\"gender\" = ?",
+          "params": [
+            "F"
+          ]
+        },
+        {
+          "id": "q06",
+          "expected": 8,
+          "correct": true,
+          "status": "ok",
+          "value": 8,
+          "sql": "select count(*) from \"patients\" b where b.\"gender\" = ?",
+          "params": [
+            "M"
+          ]
+        },
+        {
+          "id": "q07",
+          "expected": 0,
+          "correct": true,
+          "status": "ok",
+          "value": 0,
+          "sql": "select count(*) from \"patients\" b where b.\"gender\" = ?",
+          "params": [
+            "X"
+          ]
+        },
+        {
+          "id": "q08",
+          "expected": 24,
+          "correct": true,
+          "status": "ok",
+          "value": 24,
+          "sql": "select count(*) from \"encounters\" b",
+          "params": []
+        },
+        {
+          "id": "q09",
+          "expected": 12,
+          "correct": true,
+          "status": "ok",
+          "value": 12,
+          "sql": "select count(*) from \"encounters\" b where b.\"encounterclass\" = ?",
+          "params": [
+            "wellness"
+          ]
+        },
+        {
+          "id": "q10",
+          "expected": 12,
+          "correct": true,
+          "status": "ok",
+          "value": 12,
+          "sql": "select count(*) from \"encounters\" b where b.\"encounterclass\" = ?",
+          "params": [
+            "ambulatory"
+          ]
+        },
+        {
+          "id": "q11",
+          "expected": 0,
+          "correct": true,
+          "status": "ok",
+          "value": 0,
+          "sql": "select count(*) from \"encounters\" b where b.\"encounterclass\" = ?",
+          "params": [
+            "emergency"
+          ]
+        },
+        {
+          "id": "q12",
+          "expected": 0,
+          "correct": true,
+          "status": "ok",
+          "value": 0,
+          "sql": "select count(*) from \"encounters\" b where b.\"encounterclass\" = ?",
+          "params": [
+            "inpatient"
+          ]
+        },
+        {
+          "id": "q13",
+          "expected": 16,
+          "correct": true,
+          "status": "ok",
+          "value": 16,
+          "sql": "select count(*) from \"claims\" b",
+          "params": []
+        },
+        {
+          "id": "q14",
+          "expected": 8,
+          "correct": true,
+          "status": "ok",
+          "value": 8,
+          "sql": "select count(*) from \"claims\" b where b.\"status\" = ?",
+          "params": [
+            "paid"
+          ]
+        },
+        {
+          "id": "q15",
+          "expected": 8,
+          "correct": true,
+          "status": "ok",
+          "value": 8,
+          "sql": "select count(*) from \"claims\" b where b.\"status\" = ?",
+          "params": [
+            "pending"
+          ]
+        },
+        {
+          "id": "q16",
+          "expected": 0,
+          "correct": true,
+          "status": "ok",
+          "value": 0,
+          "sql": "select count(*) from \"claims\" b where b.\"status\" = ?",
+          "params": [
+            "denied"
+          ]
+        },
+        {
+          "id": "q17",
+          "expected": 0,
+          "correct": true,
+          "status": "ok",
+          "value": 0,
+          "sql": "select count(*) from \"claims\" b where b.\"status\" = ?",
+          "params": [
+            "void"
+          ]
+        },
+        {
+          "id": "q18",
+          "expected": 1400,
+          "correct": true,
+          "status": "ok",
+          "value": 1400.0,
+          "sql": "select sum(cast(b.\"cost\" as double)) from \"claims\" b",
+          "params": []
+        },
+        {
+          "id": "q19",
+          "expected": 600,
+          "correct": true,
+          "status": "ok",
+          "value": 600.0,
+          "sql": "select sum(cast(b.\"cost\" as double)) from \"claims\" b where b.\"status\" = ?",
+          "params": [
+            "paid"
+          ]
+        },
+        {
+          "id": "q20",
+          "expected": 800,
+          "correct": true,
+          "status": "ok",
+          "value": 800.0,
+          "sql": "select sum(cast(b.\"cost\" as double)) from \"claims\" b where b.\"status\" = ?",
+          "params": [
+            "pending"
+          ]
+        },
+        {
+          "id": "q21",
+          "expected": null,
+          "correct": true,
+          "status": "ok",
+          "value": null,
+          "sql": "select sum(cast(b.\"cost\" as double)) from \"claims\" b where b.\"status\" = ?",
+          "params": [
+            "denied"
+          ]
+        },
+        {
+          "id": "q22",
+          "expected": null,
+          "correct": true,
+          "status": "ok",
+          "value": null,
+          "sql": "select sum(cast(b.\"cost\" as double)) from \"claims\" b where b.\"status\" = ?",
+          "params": [
+            "void"
+          ]
+        },
+        {
+          "id": "q23",
+          "expected": null,
+          "correct": true,
+          "status": "ok",
+          "value": null,
+          "sql": "select sum(cast(b.\"cost\" as double)) from \"claims\" b where b.\"status\" = ?",
+          "params": [
+            "closed"
+          ]
+        },
+        {
+          "id": "q24",
+          "expected": null,
+          "correct": true,
+          "status": "ok",
+          "value": null,
+          "sql": "select sum(cast(b.\"cost\" as double)) from \"claims\" b where b.\"status\" = ?",
+          "params": [
+            "open"
+          ]
+        },
+        {
+          "id": "q25",
+          "expected": 87.5,
+          "correct": true,
+          "status": "ok",
+          "value": 87.5,
+          "sql": "select avg(cast(b.\"cost\" as double)) from \"claims\" b",
+          "params": []
+        },
+        {
+          "id": "q26",
+          "expected": 75.0,
+          "correct": true,
+          "status": "ok",
+          "value": 75.0,
+          "sql": "select avg(cast(b.\"cost\" as double)) from \"claims\" b where b.\"status\" = ?",
+          "params": [
+            "paid"
+          ]
+        },
+        {
+          "id": "q27",
+          "expected": 100.0,
+          "correct": true,
+          "status": "ok",
+          "value": 100.0,
+          "sql": "select avg(cast(b.\"cost\" as double)) from \"claims\" b where b.\"status\" = ?",
+          "params": [
+            "pending"
+          ]
+        },
+        {
+          "id": "q28",
+          "expected": null,
+          "correct": true,
+          "status": "ok",
+          "value": null,
+          "sql": "select avg(cast(b.\"cost\" as double)) from \"claims\" b where b.\"status\" = ?",
+          "params": [
+            "denied"
+          ]
+        },
+        {
+          "id": "q29",
+          "expected": null,
+          "correct": true,
+          "status": "ok",
+          "value": null,
+          "sql": "select avg(cast(b.\"cost\" as double)) from \"claims\" b where b.\"status\" = ?",
+          "params": [
+            "void"
+          ]
+        },
+        {
+          "id": "q30",
+          "expected": null,
+          "correct": true,
+          "status": "ok",
+          "value": null,
+          "sql": "select avg(cast(b.\"cost\" as double)) from \"claims\" b where b.\"status\" = ?",
+          "params": [
+            "closed"
+          ]
+        },
+        {
+          "id": "q31",
+          "expected": null,
+          "correct": true,
+          "status": "ok",
+          "value": null,
+          "sql": "select avg(cast(b.\"cost\" as double)) from \"claims\" b where b.\"status\" = ?",
+          "params": [
+            "open"
+          ]
+        },
+        {
+          "id": "q32",
+          "expected": null,
+          "correct": true,
+          "status": "ok",
+          "value": null,
+          "sql": "select avg(cast(b.\"cost\" as double)) from \"claims\" b where b.\"status\" = ?",
+          "params": [
+            "review"
+          ]
+        }
+      ]
+    },
+    "ontology_verified": {
+      "correct": 32,
+      "total": 32,
+      "accuracy": 1.0,
+      "returned": 32,
+      "wrong_returned": 0,
+      "cases": [
+        {
+          "id": "q01",
+          "expected": 12,
+          "correct": true,
+          "status": "ok",
+          "value": 12,
+          "sql": "select count(*) from \"patients\" b",
+          "params": []
+        },
+        {
+          "id": "q02",
+          "expected": 6,
+          "correct": true,
+          "status": "ok",
+          "value": 6,
+          "sql": "select count(*) from \"patients\" b where b.\"city\" = ?",
+          "params": [
+            "Boston"
+          ]
+        },
+        {
+          "id": "q03",
+          "expected": 6,
+          "correct": true,
+          "status": "ok",
+          "value": 6,
+          "sql": "select count(*) from \"patients\" b where b.\"city\" = ?",
+          "params": [
+            "Salem"
+          ]
+        },
+        {
+          "id": "q04",
+          "expected": 0,
+          "correct": true,
+          "status": "ok",
+          "value": 0,
+          "sql": "select count(*) from \"patients\" b where b.\"city\" = ?",
+          "params": [
+            "Cambridge"
+          ]
+        },
+        {
+          "id": "q05",
+          "expected": 4,
+          "correct": true,
+          "status": "ok",
+          "value": 4,
+          "sql": "select count(*) from \"patients\" b where b.\"gender\" = ?",
+          "params": [
+            "F"
+          ]
+        },
+        {
+          "id": "q06",
+          "expected": 8,
+          "correct": true,
+          "status": "ok",
+          "value": 8,
+          "sql": "select count(*) from \"patients\" b where b.\"gender\" = ?",
+          "params": [
+            "M"
+          ]
+        },
+        {
+          "id": "q07",
+          "expected": 0,
+          "correct": true,
+          "status": "ok",
+          "value": 0,
+          "sql": "select count(*) from \"patients\" b where b.\"gender\" = ?",
+          "params": [
+            "X"
+          ]
+        },
+        {
+          "id": "q08",
+          "expected": 24,
+          "correct": true,
+          "status": "ok",
+          "value": 24,
+          "sql": "select count(*) from \"encounters\" b",
+          "params": []
+        },
+        {
+          "id": "q09",
+          "expected": 12,
+          "correct": true,
+          "status": "ok",
+          "value": 12,
+          "sql": "select count(*) from \"encounters\" b where b.\"encounterclass\" = ?",
+          "params": [
+            "wellness"
+          ]
+        },
+        {
+          "id": "q10",
+          "expected": 12,
+          "correct": true,
+          "status": "ok",
+          "value": 12,
+          "sql": "select count(*) from \"encounters\" b where b.\"encounterclass\" = ?",
+          "params": [
+            "ambulatory"
+          ]
+        },
+        {
+          "id": "q11",
+          "expected": 0,
+          "correct": true,
+          "status": "ok",
+          "value": 0,
+          "sql": "select count(*) from \"encounters\" b where b.\"encounterclass\" = ?",
+          "params": [
+            "emergency"
+          ]
+        },
+        {
+          "id": "q12",
+          "expected": 0,
+          "correct": true,
+          "status": "ok",
+          "value": 0,
+          "sql": "select count(*) from \"encounters\" b where b.\"encounterclass\" = ?",
+          "params": [
+            "inpatient"
+          ]
+        },
+        {
+          "id": "q13",
+          "expected": 16,
+          "correct": true,
+          "status": "ok",
+          "value": 16,
+          "sql": "select count(*) from \"claims\" b",
+          "params": []
+        },
+        {
+          "id": "q14",
+          "expected": 8,
+          "correct": true,
+          "status": "ok",
+          "value": 8,
+          "sql": "select count(*) from \"claims\" b where b.\"status\" = ?",
+          "params": [
+            "paid"
+          ]
+        },
+        {
+          "id": "q15",
+          "expected": 8,
+          "correct": true,
+          "status": "ok",
+          "value": 8,
+          "sql": "select count(*) from \"claims\" b where b.\"status\" = ?",
+          "params": [
+            "pending"
+          ]
+        },
+        {
+          "id": "q16",
+          "expected": 0,
+          "correct": true,
+          "status": "ok",
+          "value": 0,
+          "sql": "select count(*) from \"claims\" b where b.\"status\" = ?",
+          "params": [
+            "denied"
+          ]
+        },
+        {
+          "id": "q17",
+          "expected": 0,
+          "correct": true,
+          "status": "ok",
+          "value": 0,
+          "sql": "select count(*) from \"claims\" b where b.\"status\" = ?",
+          "params": [
+            "void"
+          ]
+        },
+        {
+          "id": "q18",
+          "expected": 1400,
+          "correct": true,
+          "status": "ok",
+          "value": 1400.0,
+          "sql": "select sum(cast(b.\"cost\" as double)) from \"claims\" b",
+          "params": []
+        },
+        {
+          "id": "q19",
+          "expected": 600,
+          "correct": true,
+          "status": "ok",
+          "value": 600.0,
+          "sql": "select sum(cast(b.\"cost\" as double)) from \"claims\" b where b.\"status\" = ?",
+          "params": [
+            "paid"
+          ]
+        },
+        {
+          "id": "q20",
+          "expected": 800,
+          "correct": true,
+          "status": "ok",
+          "value": 800.0,
+          "sql": "select sum(cast(b.\"cost\" as double)) from \"claims\" b where b.\"status\" = ?",
+          "params": [
+            "pending"
+          ]
+        },
+        {
+          "id": "q21",
+          "expected": null,
+          "correct": true,
+          "status": "ok",
+          "value": null,
+          "sql": "select sum(cast(b.\"cost\" as double)) from \"claims\" b where b.\"status\" = ?",
+          "params": [
+            "denied"
+          ]
+        },
+        {
+          "id": "q22",
+          "expected": null,
+          "correct": true,
+          "status": "ok",
+          "value": null,
+          "sql": "select sum(cast(b.\"cost\" as double)) from \"claims\" b where b.\"status\" = ?",
+          "params": [
+            "void"
+          ]
+        },
+        {
+          "id": "q23",
+          "expected": null,
+          "correct": true,
+          "status": "ok",
+          "value": null,
+          "sql": "select sum(cast(b.\"cost\" as double)) from \"claims\" b where b.\"status\" = ?",
+          "params": [
+            "closed"
+          ]
+        },
+        {
+          "id": "q24",
+          "expected": null,
+          "correct": true,
+          "status": "ok",
+          "value": null,
+          "sql": "select sum(cast(b.\"cost\" as double)) from \"claims\" b where b.\"status\" = ?",
+          "params": [
+            "open"
+          ]
+        },
+        {
+          "id": "q25",
+          "expected": 87.5,
+          "correct": true,
+          "status": "ok",
+          "value": 87.5,
+          "sql": "select avg(cast(b.\"cost\" as double)) from \"claims\" b",
+          "params": []
+        },
+        {
+          "id": "q26",
+          "expected": 75.0,
+          "correct": true,
+          "status": "ok",
+          "value": 75.0,
+          "sql": "select avg(cast(b.\"cost\" as double)) from \"claims\" b where b.\"status\" = ?",
+          "params": [
+            "paid"
+          ]
+        },
+        {
+          "id": "q27",
+          "expected": 100.0,
+          "correct": true,
+          "status": "ok",
+          "value": 100.0,
+          "sql": "select avg(cast(b.\"cost\" as double)) from \"claims\" b where b.\"status\" = ?",
+          "params": [
+            "pending"
+          ]
+        },
+        {
+          "id": "q28",
+          "expected": null,
+          "correct": true,
+          "status": "ok",
+          "value": null,
+          "sql": "select avg(cast(b.\"cost\" as double)) from \"claims\" b where b.\"status\" = ?",
+          "params": [
+            "denied"
+          ]
+        },
+        {
+          "id": "q29",
+          "expected": null,
+          "correct": true,
+          "status": "ok",
+          "value": null,
+          "sql": "select avg(cast(b.\"cost\" as double)) from \"claims\" b where b.\"status\" = ?",
+          "params": [
+            "void"
+          ]
+        },
+        {
+          "id": "q30",
+          "expected": null,
+          "correct": true,
+          "status": "ok",
+          "value": null,
+          "sql": "select avg(cast(b.\"cost\" as double)) from \"claims\" b where b.\"status\" = ?",
+          "params": [
+            "closed"
+          ]
+        },
+        {
+          "id": "q31",
+          "expected": null,
+          "correct": true,
+          "status": "ok",
+          "value": null,
+          "sql": "select avg(cast(b.\"cost\" as double)) from \"claims\" b where b.\"status\" = ?",
+          "params": [
+            "open"
+          ]
+        },
+        {
+          "id": "q32",
+          "expected": null,
+          "correct": true,
+          "status": "ok",
+          "value": null,
+          "sql": "select avg(cast(b.\"cost\" as double)) from \"claims\" b where b.\"status\" = ?",
+          "params": [
+            "review"
+          ]
+        }
+      ]
+    }
+  }
+}
