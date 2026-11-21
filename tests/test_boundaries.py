@@ -31,3 +31,27 @@ def test_query_context_and_database_exclude_protected_fields(db):
         assert session.execute("select column_name from information_schema.columns where table_name='patients'").fetchall() == [("city",)]
     with pytest.raises(ValueError):
         answer(db, role_objects, {"metric": "patients.private_note"})
+
+
+def test_review_rejects_inflation_and_preserves_history(db, tmp_path):
+    from ontology.proposer import fixture_proposal
+    from ontology.store import Store
+
+    store = Store(tmp_path / "review.sqlite")
+    proposal = fixture_proposal(db)
+    batch = store.stage(db, proposal)
+    stale = store.stage(db, proposal)
+    for pending in (batch, stale):
+        for change in store.changes(pending):
+            if not change["validation"]["ok"]:
+                with pytest.raises(ValueError, match="Validation failed"):
+                    store.decide(change["id"], "approve")
+                store.decide(change["id"], "reject")
+            else:
+                store.decide(change["id"], "approve")
+    version = store.publish(batch)
+    assert store.publish(batch) == version
+    assert store.snapshot(0) == []
+    assert "inflated_claim_cost" not in {obj["name"] for obj in store.snapshot(version)}
+    with pytest.raises(ValueError, match="Stale batch"):
+        store.publish(stale)
