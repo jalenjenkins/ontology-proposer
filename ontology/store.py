@@ -37,14 +37,17 @@ class Store:
             db.close()
 
     def snapshot(self, version=None):
+        return self.versioned_snapshot(version)[1]
+
+    def versioned_snapshot(self, version=None):
         with self.connect() as db:
             if version is None:
-                row = db.execute("select snapshot from versions order by id desc limit 1").fetchone()
+                row = db.execute("select id,snapshot from versions order by id desc limit 1").fetchone()
             else:
-                row = db.execute("select snapshot from versions where id=?", [version]).fetchone()
+                row = db.execute("select id,snapshot from versions where id=?", [version]).fetchone()
             if row is None:
                 raise ValueError("Unknown version")
-            return json.loads(row[0])
+            return row[0], json.loads(row[1])
 
     def stage(self, path, objects):
         def identity(obj):

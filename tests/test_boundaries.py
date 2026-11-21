@@ -79,3 +79,64 @@ def test_verification_withholds_fanout_if_source_drifts(db):
                   op="sum", column="cost", joins=[dict(table="claim_lines", left="id", right="claim")])
     with open_db(db, True) as session:
         assert execute_plan(session, [metric], {"metric": "cost"}, verify=True)["status"] == "disagreement"
+
+
+def test_shortlist_preserves_exact_candidates(db):
+    fast = profile(db)
+    exhaustive = profile(db, shortlist=False)
+    assert fast["columns"] == exhaustive["columns"]
+    assert fast["joins"] == exhaustive["joins"]
+    assert fast["timing"]["table_stats_queries"] == 4
+    assert fast["timing"]["exact_probes"] < exhaustive["timing"]["exact_probes"]
+
+
+def test_projection_cache_reuses_and_isolates_roles_and_versions(db, tmp_path, monkeypatch):
+    from ontology.data import open_db
+    from ontology.proposer import fixture_proposal
+    from ontology import semantic
+
+    proposal = fixture_proposal(db)
+    original = semantic.build_projection
+    builds = []
+
+    def build(*args):
+        builds.append(args[1])
+        original(*args)
+
+    monkeypatch.setattr(semantic, "build_projection", build)
+    cache = tmp_path / "cache"
+    for role, version, expected in (
+        ("analyst", 1, 3), ("analyst", 1, 3), ("admin", 1, 4), ("analyst", 2, 3),
+    ):
+        with scoped(db, visible(proposal, role), cache_dir=cache, role=role, version=version) as session:
+            assert len(session.execute("select * from patients limit 0").description) == expected
+    assert len(builds) == 3
+    with open_db(db) as writer:
+        writer.execute("update patients set city='New' where id=1")
+    with scoped(db, visible(proposal, "analyst"), cache_dir=cache, role="analyst", version=1) as session:
+        assert session.execute("select city from patients where id=1").fetchone() == ("New",)
+    assert len(builds) == 4
+
+
+def test_paired_live_reuses_primary_plan(db, monkeypatch):
+    from ontology.proposer import fixture_proposal
+    from ontology.query import live_answer
+
+    calls = []
+
+    def fake_messages(system, context, tools, handle):
+        calls.append(context)
+        if "ontology" in context:
+            return {"metric": "claim_cost"}
+        return "select sum(cost) from claims" if context["previous_sql"] else "select sum(cost) from claims join claim_lines on claims.id=claim_lines.claim"
+
+    monkeypatch.setattr("ontology.query.messages", fake_messages)
+    objects = visible(fixture_proposal(db), "analyst")
+    with scoped(db, objects) as session:
+        single, verified = live_answer(session, "Total claim cost?", paired=True)
+        assert single["value"] == 2875
+        assert verified["status"] == "disagreement"
+        single, verified = live_answer(session, "Total claim cost?", objects, paired=True)
+        assert single == verified and single["value"] == 1400
+    assert len(calls) == 3
+    assert calls[1]["previous_sql"] is not None

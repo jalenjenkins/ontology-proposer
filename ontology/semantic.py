@@ -1,4 +1,8 @@
+import json
+import os
+import stat
 from contextlib import contextmanager
+from hashlib import sha256
 from math import isclose
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -57,8 +61,9 @@ def validate(path, obj):
             if kind == "entity":
                 return dict(ok=True, rows=total)
             base = dict(obj, joins=[])
-            base_source, base_params = source(base)
-            expected = db.execute(f"select count(*) from {base_source}", base_params).fetchone()[0]
+            base_sql, base_params = rollup(base)
+            expected, base_value = db.execute(
+                f"select count(*), {base_sql.removeprefix('select ')}", base_params).fetchone()
             joined, params = source(obj)
             measured = f"count(b.{ident(obj['column'])})" if obj.get("column") else "count(*)"
             grain_sql = f"select count(*), count(distinct b.{key}), {measured} from {joined}"
@@ -68,7 +73,7 @@ def validate(path, obj):
             return dict(ok=rows == distinct_keys == expected == nonnull and value is not None,
                         rows=rows, distinct_keys=distinct_keys, expected_rows=expected,
                         null_rate=(rows-nonnull)/rows if rows else None,
-                        value=value, sql=sql, params=params, grain_sql=grain_sql)
+                        value=value, base_value=base_value, sql=sql, params=params, grain_sql=grain_sql)
     except (KeyError, ValueError, TypeError, AttributeError, duckdb.Error) as exc:
         return dict(ok=False, reason=str(exc))
 
@@ -92,21 +97,53 @@ def visible(objects, role):
             if dependencies(obj) <= properties]
 
 
+def source_revision(path):
+    info = path.stat()
+    if path.with_name(path.name + ".wal").exists():
+        return None
+    return (str(path), info.st_dev, info.st_ino, info.st_size, info.st_mtime_ns, info.st_ctime_ns)
+
+
+def build_projection(path, projection, columns):
+    source_path = str(path).replace("'", "''")
+    with duckdb.connect(str(projection), config={"threads": "2"}) as builder:
+        builder.execute(f"attach '{source_path}' as source_data (read_only)")
+        builder.execute("begin")
+        for table, names in sorted(columns.items()):
+            fields = ", ".join(ident(name) for name in sorted(names))
+            builder.execute(f"create table {ident(table)} as "
+                            f"select {fields} from source_data.main.{ident(table)}")
+        builder.execute("commit")
+
+
 @contextmanager
-def scoped(path, objects):
+def scoped(path, objects, *, cache_dir=None, version=None, role=None):
+    path = Path(path).resolve()
     columns = {}
     for obj in objects:
         if obj["kind"] == "property":
             columns.setdefault(obj["table"], set()).add(obj["column"])
-    with TemporaryDirectory(prefix="ontology-role-") as folder:
+    revision = source_revision(path) if cache_dir is not None else None
+    destination = None
+    if revision is not None and version is not None and role is not None:
+        cache_dir = Path(cache_dir)
+        cache_dir.mkdir(mode=0o700, parents=True, exist_ok=True)
+        info = cache_dir.lstat()
+        if not stat.S_ISDIR(info.st_mode) or info.st_uid != os.getuid() or info.st_mode & 0o077:
+            raise ValueError("Projection cache directory must be private and owned by the current user")
+        identity = json.dumps([1, revision, version, role, objects], sort_keys=True, default=str)
+        destination = cache_dir / (sha256(identity.encode()).hexdigest() + ".duckdb")
+        if destination.is_file() and source_revision(path) == revision:
+            with open_db(destination, True) as session:
+                yield session
+            return
+    with TemporaryDirectory(prefix="ontology-role-", dir=cache_dir if destination else None) as folder:
         projection = Path(folder) / "projection.duckdb"
-        source_path = str(Path(path).resolve()).replace("'", "''")
-        with duckdb.connect(str(projection), config={"threads": "2"}) as builder:
-            builder.execute(f"attach '{source_path}' as source_data (read_only)")
-            for table, names in sorted(columns.items()):
-                fields = ", ".join(ident(name) for name in sorted(names))
-                builder.execute(f"create table {ident(table)} as "
-                                f"select {fields} from source_data.main.{ident(table)}")
+        build_projection(path, projection, columns)
+        if destination is not None and source_revision(path) == revision:
+            projection.chmod(0o600)
+            os.replace(projection, destination)
+            projection = destination
         with open_db(projection, True) as session:
             yield session
 
@@ -133,7 +170,7 @@ def independent(db, metric, where):
     return total if metric["op"] == "sum" else total / len(nonnull)
 
 
-def execute_plan(db, objects, plan, verify=False):
+def execute_plan(db, objects, plan, verify=False, *, paired=False):
     metrics = {obj["name"]: obj for obj in objects if obj["kind"] == "metric"}
     if plan.get("metric") not in metrics:
         raise ValueError("Metric unavailable for this role")
@@ -147,9 +184,11 @@ def execute_plan(db, objects, plan, verify=False):
             raise ValueError("Filter unavailable for this role")
     sql, params = rollup(metric, where)
     value = db.execute(sql, params).fetchone()[0]
-    if verify and not equivalent(value, independent(db, metric, where)):
-        return dict(status="disagreement", sql=sql)
-    return dict(status="ok", value=value, sql=sql, params=params)
+    primary = dict(status="ok", value=value, sql=sql, params=params)
+    checked = primary
+    if (verify or paired) and not equivalent(value, independent(db, metric, where)):
+        checked = dict(status="disagreement", sql=sql)
+    return (primary, checked) if paired else checked
 
 
 def answer(path, objects, plan, verify=False):

@@ -1,9 +1,9 @@
 import json
 import os
-import sys
-from urllib.error import URLError
 import re
+import sys
 from pathlib import Path
+from urllib.error import URLError
 
 from ontology.data import open_db
 from ontology.query import live_answer
@@ -68,25 +68,31 @@ def evaluate(path, objects, live=False, synthea=False):
     results = {}
     with scoped(path, objects) as db:
         for semantic in (False, True):
-            for verify in (False, True):
-                key = f"{'ontology' if semantic else 'schema'}_{'verified' if verify else 'single'}"
-                if live:
-                    print(f"Running {key} ({len(cases)} questions)", file=sys.stderr, flush=True)
-                rows = []
-                for case, gold in zip(cases, expected):
-                    try:
-                        answer = (live_answer(db, case["question"], objects if semantic else None, verify)
-                                  if live else offline_answer(db, case["question"], objects, semantic, verify, synthea))
-                        correct = answer["status"] == "ok" and equivalent(answer["value"], gold)
-                    except (URLError, TimeoutError):
-                        raise
-                    except Exception as exc:
-                        answer, correct = dict(status="error", error=type(exc).__name__), False
-                    rows.append(dict(id=case["id"], expected=gold, correct=correct, **answer))
+            label = "ontology" if semantic else "schema"
+            if live:
+                print(f"Running paired {label} evaluation ({len(cases)} questions)", file=sys.stderr, flush=True)
+            single, verified = [], []
+            for case, gold in zip(cases, expected):
+                try:
+                    if live:
+                        outcomes = live_answer(db, case["question"], objects if semantic else None, paired=True)
+                    else:
+                        outcomes = tuple(offline_answer(db, case["question"], objects, semantic, verify, synthea)
+                                         for verify in (False, True))
+                except (URLError, TimeoutError):
+                    raise
+                except Exception as exc:
+                    error = dict(status="error", error=type(exc).__name__)
+                    outcomes = error, error
+                for rows, result in zip((single, verified), outcomes):
+                    correct = result["status"] == "ok" and equivalent(result["value"], gold)
+                    rows.append(dict(id=case["id"], expected=gold, correct=correct, **result))
+            for suffix, rows in (("single", single), ("verified", verified)):
                 correct = sum(row["correct"] for row in rows)
                 returned = sum(row["status"] == "ok" for row in rows)
-                results[key] = dict(correct=correct, total=len(rows), accuracy=correct / len(rows),
-                                    returned=returned, wrong_returned=returned-correct, cases=rows)
+                results[f"{label}_{suffix}"] = dict(
+                    correct=correct, total=len(rows), accuracy=correct / len(rows),
+                    returned=returned, wrong_returned=returned - correct, cases=rows)
     report = dict(mode="live" if live else "offline", dataset="synthea" if synthea else "fixture", results=results)
     if live:
         report["model"] = os.environ["ANTHROPIC_MODEL"]

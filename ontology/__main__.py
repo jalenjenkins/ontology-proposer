@@ -6,7 +6,7 @@ from ontology.benchmark import compare, evaluate
 from ontology.data import demo, load_csv, profile
 from ontology.proposer import fixture_proposal, propose, synthea_proposal
 from ontology.query import live_answer
-from ontology.semantic import answer, scoped, visible
+from ontology.semantic import execute_plan, scoped, visible
 from ontology.store import Store
 
 
@@ -19,6 +19,8 @@ def main():
         sub = commands.add_parser(name)
         if name in {"review", "publish"}:
             sub.add_argument("batch", type=int)
+        if name == "profile":
+            sub.add_argument("--exhaustive", action="store_true")
         if name == "serve":
             sub.add_argument("--port", type=int, default=8765)
     commands.add_parser("load").add_argument("csv_dir")
@@ -34,6 +36,7 @@ def main():
     query.add_argument("--verify", action="store_true")
     query.add_argument("--live", action="store_true")
     query.add_argument("--version", type=int)
+    query.add_argument("--cache-dir", type=Path, default=Path(".ontology-cache"))
     benchmark = commands.add_parser("eval")
     benchmark.add_argument("--live", action="store_true")
     benchmark.add_argument("--synthea", action="store_true")
@@ -46,7 +49,7 @@ def main():
     if cmd == "load":
         return load_csv(args.csv_dir, args.db)
     if cmd == "profile":
-        return profile(args.db)
+        return profile(args.db, shortlist=not args.exhaustive)
     store = Store(args.store)
     if cmd == "propose":
         adapter = fixture_proposal if args.offline else synthea_proposal if args.synthea_reference else propose
@@ -60,11 +63,12 @@ def main():
     if cmd == "publish":
         return dict(version=store.publish(args.batch))
     if cmd == "query":
-        objects = visible(store.snapshot(args.version), args.role)
-        if args.live:
-            with scoped(args.db, objects) as db:
+        version, snapshot = store.versioned_snapshot(args.version)
+        objects = visible(snapshot, args.role)
+        with scoped(args.db, objects, cache_dir=args.cache_dir, version=version, role=args.role) as db:
+            if args.live:
                 return live_answer(db, args.request, objects, args.verify)
-        return answer(args.db, objects, json.loads(args.request), args.verify)
+            return execute_plan(db, objects, json.loads(args.request), args.verify)
     if cmd == "eval":
         results = evaluate(args.db, store.snapshot(), args.live, args.synthea)
         if args.baseline:

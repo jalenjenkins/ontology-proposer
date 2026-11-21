@@ -1,10 +1,17 @@
+import duckdb
+from sqlglot.errors import SqlglotError
+
 from ontology.data import catalog
 from ontology.proposer import messages, tool
 from ontology.semantic import equivalent, execute_plan
 from ontology.sql import read_sql
 
 
-def live_answer(db, question, objects=None, verify=False):
+def live_answer(db, question, objects=None, verify=False, *, paired=False):
+    def abstain():
+        result = dict(status="abstain")
+        return (result, result) if paired else result
+
     if objects is not None:
         fields = {"metric": {"type": "string"},
                   "where": {"type": "object", "properties": {
@@ -18,7 +25,7 @@ def live_answer(db, question, objects=None, verify=False):
             {"question": question, "ontology": objects},
             [submit, tool("abstain")],
             lambda name, args: (args if name == "submit" else None, True))
-        return dict(status="abstain") if plan is None else execute_plan(db, objects, plan, verify)
+        return abstain() if plan is None else execute_plan(db, objects, plan, verify, paired=paired)
 
     def generate(exclude=None):
         return messages(
@@ -38,10 +45,16 @@ def live_answer(db, question, objects=None, verify=False):
 
     sql = generate()
     if sql is None:
-        return dict(status="abstain")
-    value = scalar(sql)
-    if verify:
+        return abstain()
+    primary = dict(status="ok", value=scalar(sql), sql=sql)
+    checked = primary
+    if verify or paired:
         alternate = generate(sql)
-        if alternate is None or alternate.strip().lower() == sql.strip().lower() or not equivalent(value, scalar(alternate)):
-            return dict(status="disagreement", sql=sql)
-    return dict(status="ok", value=value, sql=sql)
+        try:
+            agrees = (alternate is not None and alternate.strip().lower() != sql.strip().lower()
+                      and equivalent(primary["value"], scalar(alternate)))
+        except (ValueError, TypeError, duckdb.Error, SqlglotError):
+            agrees = False
+        if not agrees:
+            checked = dict(status="disagreement", sql=sql)
+    return (primary, checked) if paired else checked

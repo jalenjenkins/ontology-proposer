@@ -23,7 +23,7 @@ flowchart LR
     X --> E[Answer or disagreement]
 ```
 
-Watch the [1:51 recorded walkthrough](demo/ontology-proposer-walkthrough.mp4) for profiling, proposal review, publication, and analyst verification on the local DuckDB healthcare fixture. The recording includes narration and English captions.
+Watch the [updated proposal-review demo](demo/ontology-proposer-review-v2.mp4) for profiling, proposal review, publication, and analyst verification on the local DuckDB healthcare fixture. It includes narration and English captions. The [previous walkthrough](demo/ontology-proposer-walkthrough.mp4) shows the earlier reviewer.
 
 ## Run locally
 
@@ -78,7 +78,7 @@ python -m ontology --db synthea.duckdb --store synthea.sqlite eval \
   --synthea --live --output eval/synthea-live.json
 ```
 
-The four configurations can make up to 160 billable model calls. The run prints progress by configuration and writes the report after all four finish. Both live arms use the configured model and share the same analyst-scoped data. Run `propose` without an adapter flag to generate a separate Claude-authored proposal for review. Use `query --live` for individual natural-language queries.
+The four configurations share primary answers and can make up to 96 billable model calls for 32 questions. Each schema-only answer gets at most one alternate-SQL call. Ontology verification recomputes locally. The run prints progress by paired condition and writes the report after both finish. Both live arms use the configured model and share the same analyst-scoped data. Run `propose` without an adapter flag to generate a separate Claude-authored proposal for review. Use `query --live` for individual natural-language queries.
 
 ## Evaluation
 
@@ -92,6 +92,12 @@ See the [Synthea questions](eval/synthea-questions.json), [fixture questions](ev
 | Ontology + verification | 32/32 (100%) | 0 | 32/32 (100%) | 0 |
 
 Offline scores exercise a curated ontology and a deterministic planner. The schema-only adapter deliberately reproduces a claim-grain error. This is a regression benchmark for validation and verification. Live Claude accuracy is unmeasured.
+
+## Local execution
+
+- `profile` reports table statistics scans, eligible join pairs, pruned pairs, exact probes, and wall time. `profile --exhaustive` runs every eligible exact probe for comparison. The shortlist uses a hash-bucket upper bound and exact probes provide the reported evidence. On the documented Synthea snapshot, three local runs preserved all 56 candidate joins, cut exact probes from 1,446 to 586, and reduced median profiling time from 12.47 s to 10.64 s.
+- Standalone queries reuse a physically isolated, read-only DuckDB projection in `.ontology-cache/`. Its key includes the source file identity and metadata, the ontology version, the role, and the visible definitions. Queries bypass the cache when a source WAL is present. The cache is private to the local operator and can be removed between runs. In a local Synthea spot check, opening the projection and executing the same metric took 546 ms on a cache miss and a median 21 ms over four hits, excluding CLI startup.
+- The review queue groups changes by source table and prioritizes unresolved validation failures. Use `J` and `K` to move through the displayed queue and `A` or `R` to approve or reject the selected change. Definition shows field-level changes. Validation compares the base-grain and proposed totals for fan-out.
 
 ## Failure cases
 

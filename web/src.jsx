@@ -23,10 +23,54 @@ function Json({value}) {
   return <pre>{JSON.stringify(value, null, 2)}</pre>;
 }
 
+function describe(obj) {
+  const table = obj?.table;
+  const joins = obj?.kind === 'join'
+    ? [table + '.' + obj.left + ' → ' + obj.target + '.' + obj.right]
+    : obj?.joins?.map(j => table + '.' + j.left + ' → ' + j.table + '.' + j.right);
+  return [
+    ['Grain', obj?.key && 'One row per ' + table + '.' + obj.key],
+    ['Join path', joins?.join(' · ') || (obj?.kind === 'metric' ? 'Base table only' : null)],
+    ['Metric', obj?.op && obj.op.toUpperCase() + '(' + (obj.column || '*') + ')'
+      + (obj.where ? ' where ' + obj.where.column + ' = ' + obj.where.value : '')],
+    ['Property', obj?.column && obj.kind === 'property' ? table + '.' + obj.column : null],
+    ['Role visibility', Array.isArray(obj?.roles) ? obj.roles.join(', ') : null],
+  ];
+}
+
+function Definition({before, after}) {
+  const previous = Object.fromEntries(describe(before));
+  const proposed = describe(after).filter(([name, value]) => value != null || previous[name] != null);
+  return <>
+    <table className="definition-table"><thead><tr><th scope="col">Field</th><th scope="col">Before</th><th scope="col">Proposed</th></tr></thead>
+      <tbody>{proposed.map(([name, value]) => <tr key={name} className={value !== previous[name] ? 'changed' : ''}>
+        <th scope="row">{name}</th><td>{previous[name] ?? '—'}</td><td>{value ?? '—'}</td>
+      </tr>)}</tbody></table>
+    <details><summary>Raw definitions</summary>
+      {before && <><h3>Previous definition</h3><Json value={before}/></>}
+      <h3>Proposed definition</h3><Json value={after}/>
+    </details>
+  </>;
+}
+
+function queueGroups(changes) {
+  const groups = new Map();
+  for (const change of changes) {
+    const table = change.after.table;
+    const blocked = status(change) === 'Blocked';
+    const key = (blocked ? 'blocked:' : 'table:') + table;
+    if (!groups.has(key)) groups.set(key, {key, label: blocked ? 'Needs attention / ' + table : table, changes: []});
+    groups.get(key).changes.push(change);
+  }
+  return [...groups.values()];
+}
+
 function Inspector({change, onDecide, busy, published}) {
   const {after, before, validation, decision} = change;
   const {evidence, ...definition} = after;
   const [tab, setTab] = useState('Validation');
+  const fanout = validation.rows > validation.distinct_keys;
+  const compareTotals = fanout && validation.base_value != null && validation.value != null;
   const confidence = Number.isFinite(after.confidence) ? Math.round(after.confidence * 100) + '%' : '—';
   const counts = validation.expected_rows !== undefined ? [
     ['Expected rows', validation.expected_rows],
@@ -51,20 +95,23 @@ function Inspector({change, onDecide, busy, published}) {
     <div className="inspector-body">
       {tab === 'Validation' && <>
         <div className={'callout ' + (validation.ok ? 'pass' : 'fail')}>
-          <strong>{validation.ok ? 'Validation passed' : 'Validation failed'}</strong>
+          <strong>{fanout ? number.format(validation.rows) + ' joined rows for ' +
+            number.format(validation.distinct_keys) + ' ' + after.table :
+            validation.ok ? 'Validation passed' : 'Validation failed'}</strong>
           {validation.reason && <p>{validation.reason}</p>}
           {!validation.reason && validation.rows > validation.distinct_keys && <p>The join duplicates base keys and can inflate the metric.</p>}
           {!validation.reason && !validation.ok && validation.rows === validation.distinct_keys && <p>Review the measured row counts, null rate, and result.</p>}
         </div>
+        {compareTotals && <dl className="total-comparison">
+          <div><dt>Base-grain total</dt><dd>{number.format(validation.base_value)}</dd></div>
+          <div><dt>Proposed total</dt><dd>{number.format(validation.value)}</dd></div>
+        </dl>}
         {counts.length > 0 && <dl className="counts">{counts.map(([label, value]) => <div key={label}>
           <dt>{label}</dt><dd>{number.format(value)}</dd></div>)}</dl>}
         {validation.sql && <><h3>Compiled SQL</h3><pre>{validation.sql}</pre></>}
         <details><summary>Validation output</summary><Json value={validation}/></details>
       </>}
-      {tab === 'Definition' && <>
-        {before && <><h3>Previous definition</h3><Json value={before}/></>}
-        <h3>Proposed definition</h3><Json value={definition}/>
-      </>}
+      {tab === 'Definition' && <Definition before={before} after={definition}/>}
       {tab === 'Evidence' && (evidence?.length ? evidence.map((entry, i) => <div className="evidence" key={i}>
         <h3>{entry.tool ?? 'Source observation'} · {i + 1}</h3>
         {(entry.sql || entry.args?.sql) && <pre>{entry.sql || entry.args.sql}</pre>}
@@ -74,10 +121,10 @@ function Inspector({change, onDecide, busy, published}) {
     <footer className="decision-bar">
       <span className={'badge ' + status(change).toLowerCase()}>{status(change)}</span>
       <div className="button-group">
-        <button className="secondary" disabled={busy || published} aria-pressed={decision === 'reject'}
-          onClick={() => onDecide(change.id, 'reject')}>Reject</button>
-        <button className="primary" disabled={busy || published || !validation.ok} aria-pressed={decision === 'approve'}
-          onClick={() => onDecide(change.id, 'approve')}>Approve</button>
+        <button className="secondary" disabled={busy || published} aria-pressed={decision === 'reject'} aria-keyshortcuts="R" aria-label="Reject"
+          onClick={() => onDecide(change.id, 'reject')}>Reject <kbd>R</kbd></button>
+        <button className="primary" disabled={busy || published || !validation.ok} aria-pressed={decision === 'approve'} aria-keyshortcuts="A" aria-label="Approve"
+          onClick={() => onDecide(change.id, 'approve')}>Approve <kbd>A</kbd></button>
       </div>
     </footer>
   </section>;
@@ -112,10 +159,42 @@ function Review() {
   const decided = changes.filter(c => c.decision).length;
   const approved = changes.filter(c => c.decision === 'approve').length;
   const blocked = changes.filter(c => !c.validation.ok && !c.decision).length;
-  const hits = changes.filter(c => (filter === 'All' || status(c) === filter) &&
+  const matches = changes.filter(c => (filter === 'All' || status(c) === filter) &&
     (c.after.name + ' ' + c.after.kind + ' ' + c.after.table).toLowerCase().includes(search.trim().toLowerCase()));
+  const blockedFirst = [...matches.filter(c => status(c) === 'Blocked'), ...matches.filter(c => status(c) !== 'Blocked')];
+  const groups = queueGroups(blockedFirst);
+  const hits = groups.flatMap(group => group.changes);
   const current = hits.find(c => c.id === selected) ?? hits[0];
   const published = batch?.published != null;
+
+  function decide(id, decision) {
+    setSelected(id);
+    return act(async () => {await api('decide', {id, decision}); await load(batch.id);});
+  }
+
+  useEffect(() => {
+    function shortcut(event) {
+      if (!current || event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey ||
+          event.repeat || event.target.closest?.('input, select, textarea, [contenteditable]')) return;
+      const key = event.key.toLowerCase();
+      if (key === 'j' || key === 'k') {
+        event.preventDefault();
+        const index = hits.indexOf(current) + (key === 'j' ? 1 : -1);
+        const next = hits[index];
+        if (next) {
+          setSelected(next.id);
+          document.getElementById('change-' + next.id)?.focus({preventScroll: true});
+          document.getElementById('change-' + next.id)?.scrollIntoView({block: 'nearest'});
+        }
+      } else if (!busy && !published && (key === 'r' || (key === 'a' && current.validation.ok))) {
+        event.preventDefault();
+        decide(current.id, key === 'a' ? 'approve' : 'reject');
+      }
+    }
+    window.addEventListener('keydown', shortcut);
+    return () => window.removeEventListener('keydown', shortcut);
+  });
+
 
   return <>
     <header className="masthead">
@@ -156,15 +235,26 @@ function Review() {
               {['All', 'Pending', 'Blocked', 'Approved', 'Rejected'].map(s => <option key={s}>{s}</option>)}
             </select></label>
           </div>
-          <ul>{hits.map(c => <li key={c.id}><button className="queue-row" aria-current={c.id === current?.id}
-            onClick={() => setSelected(c.id)}>
-            <ObjectMark kind={c.after.kind}/><span className="row-info"><strong>{c.after.name}</strong><small>{c.after.kind}</small></span>
-            <span className={'badge ' + status(c).toLowerCase()}>{status(c)}</span>
-          </button></li>)}</ul>
+          <div className="queue-scroll">
+            <table className="change-table">
+              <thead><tr><th scope="col">Change</th><th scope="col">Decision</th></tr></thead>
+              {groups.map(group => <tbody key={group.key}>
+                <tr className="group-heading"><th scope="rowgroup" colSpan="2">{group.label}</th></tr>
+                {group.changes.map(c => <tr key={c.id} className={c.id === current?.id ? 'active' : ''}>
+                  <td><button id={'change-' + c.id} className="queue-row" aria-current={c.id === current?.id}
+                    onClick={e => {setSelected(c.id); if (e.detail) e.currentTarget.blur();}}>
+                    <ObjectMark kind={c.after.kind}/><span className="row-info"><strong>{c.after.name}</strong><small>{c.after.kind}</small></span>
+                  </button></td>
+                  <td><span className={'badge ' + status(c).toLowerCase()}>{status(c)}</span></td>
+                </tr>)}
+              </tbody>)}
+            </table>
+          </div>
+          {hits.length > 0 && <div className="queue-shortcuts"><kbd>J</kbd> next <kbd>K</kbd> previous</div>}
           {!hits.length && <p className="empty">{busy && !batch ? 'Loading changes…' : 'No matching changes.'}</p>}
         </section>
         {current ? <Inspector key={current.id} change={current} busy={busy} published={published}
-          onDecide={(id, decision) => act(async () => {await api('decide', {id, decision}); await load(batch.id);})}/>
+          onDecide={decide}/>
           : <div className="inspector empty">Select a change to inspect its evidence.</div>}
       </div>
     </main>

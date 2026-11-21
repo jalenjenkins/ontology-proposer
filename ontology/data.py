@@ -1,4 +1,6 @@
 import re
+from collections import defaultdict
+from time import perf_counter
 from pathlib import Path
 
 import duckdb
@@ -72,28 +74,60 @@ def cardinality(db, table, column, target, target_column):
     return dict(total=total, matched=matched, max_matches=max_matches, joined=joined, sql=sql)
 
 
-def profile(path):
+def profile(path, *, shortlist=True):
+    started = perf_counter()
     with open_db(path, True) as db:
-        columns = []
+        tables = defaultdict(list)
         for table, column, dtype in catalog(db):
-            field = ident(column)
-            sql = f"select count(*), count({field}), count(distinct {field}) from {ident(table)}"
-            rows, populated, distinct = db.execute(sql).fetchone()
-            columns.append(dict(table=table, column=column, type=dtype, rows=rows,
-                                populated=populated, distinct=distinct, sql=sql))
+            tables[table].append((column, dtype))
+        columns, buckets = [], {}
+        for table, fields in tables.items():
+            aggregates = ["count(*)"]
+            for column, _ in fields:
+                field = ident(column)
+                aggregates.extend([f"count({field})", f"count(distinct {field})"])
+                if shortlist:
+                    aggregates.append(f"histogram(hash({field}) % 1024) filter (where {field} is not null)")
+            sql = f"select {', '.join(aggregates)} from {ident(table)}"
+            rows, *stats = db.execute(sql).fetchone()
+            stride = 3 if shortlist else 2
+            for i, (column, dtype) in enumerate(fields):
+                offset = i * stride
+                field = ident(column)
+                evidence = f"select count(*), count({field}), count(distinct {field}) from {ident(table)}"
+                columns.append(dict(table=table, column=column, type=dtype, rows=rows,
+                                    populated=stats[offset], distinct=stats[offset + 1], sql=evidence))
+                if shortlist:
+                    buckets[table, column] = stats[offset + 2] or {}
+
+        targets = defaultdict(list)
+        for target in columns:
+            if target["rows"] == target["populated"] == target["distinct"]:
+                targets[target["type"]].append(target)
         joins = []
+        eligible = probes = 0
         for source in columns:
             if source["distinct"] < 2:
                 continue
-            for target in columns:
-                if (source["table"] == target["table"] or source["type"] != target["type"]
-                        or not target["rows"] == target["populated"] == target["distinct"]
-                        or source["distinct"] > target["distinct"]):
+            for target in targets[source["type"]]:
+                if source["table"] == target["table"] or source["distinct"] > target["distinct"]:
                     continue
+                eligible += 1
+                if shortlist:
+                    source_bins = buckets[source["table"], source["column"]]
+                    target_bins = buckets[target["table"], target["column"]]
+                    # A row can only match a key in the same bucket. Collisions can
+                    # overestimate overlap, so only prune on the conservative bound.
+                    possible = sum(count for bucket, count in source_bins.items() if bucket in target_bins)
+                    if possible * 10 < source["populated"] * 9:
+                        continue
+                probes += 1
                 evidence = cardinality(db, source["table"], source["column"], target["table"], target["column"])
                 overlap = evidence["matched"] / evidence["total"]
                 if overlap >= 0.9:
                     joins.append(dict(source=source["table"], column=source["column"],
                                       target=target["table"], target_column=target["column"],
                                       overlap=overlap, **evidence))
-        return dict(columns=columns, joins=joins)
+        return dict(columns=columns, joins=joins, timing=dict(
+            elapsed_ms=round((perf_counter() - started) * 1000, 1), table_stats_queries=len(tables),
+            eligible_pairs=eligible, exact_probes=probes, pruned_pairs=eligible - probes))
