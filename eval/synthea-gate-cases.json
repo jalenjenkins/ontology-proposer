@@ -1,0 +1,14 @@
+[
+  {"id":"cost-total","role":"analyst","plan":{"metric":"encounter_claim_cost"},"dependencies":"structured_v1"},
+  {"id":"cost-urgent","role":"analyst","plan":{"metric":"encounter_claim_cost","where":{"column":"ENCOUNTERCLASS","value":"urgentcare"}},"dependencies":"structured_v1"},
+  {"id":"cost-admin","role":"admin","plan":{"metric":"encounter_claim_cost"},"dependencies":"structured_v1"},
+  {"id":"patient-boston","role":"analyst","plan":{"metric":"patient_count","where":{"column":"CITY","value":"Boston"}},"dependencies":"structured_v1"},
+  {"id":"patient-boston-admin","role":"admin","plan":{"metric":"patient_count","where":{"column":"CITY","value":"Boston"}},"dependencies":"structured_v1"},
+  {"id":"patient-total","role":"analyst","plan":{"metric":"patient_count"},"dependencies":"structured_v1"},
+  {"id":"encounter-total","role":"analyst","plan":{"metric":"encounter_count"},"dependencies":"structured_v1"},
+  {"id":"claim-total","role":"analyst","plan":{"metric":"claim_count"},"dependencies":"structured_v1"},
+  {"id":"claim-closed","role":"analyst","plan":{"metric":"claim_count","where":{"column":"STATUS1","value":"CLOSED"}},"dependencies":"structured_v1"},
+  {"id":"mean-encounter-cost","role":"analyst","plan":{"metric":"average_encounter_claim_cost"},"dependencies":"structured_v1"},
+  {"id":"mean-home-cost","role":"analyst","plan":{"metric":"average_encounter_claim_cost","where":{"column":"ENCOUNTERCLASS","value":"home"}},"dependencies":"structured_v1"},
+  {"id":"encounter-emergency","role":"admin","plan":{"metric":"encounter_count","where":{"column":"ENCOUNTERCLASS","value":"emergency"}},"dependencies":"structured_v1"}
+]

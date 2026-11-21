@@ -11,3 +11,10 @@ This project was AI-assisted. The initial project brief specified the components
 | Use a second model call to verify every semantic answer. | Recompute from base rows with Python for the supported grain-preserving aggregate grammar. The live schema-only baseline uses a second SQL generation call. |
 | Use only a fixture during development. | Build a keyless fixture for tests and exercise the same pipeline on the official Synthea sample. Keep handcrafted reference proposals and the unsafe deterministic baseline visible in source. |
 | Claim an ontology accuracy improvement from the offline comparison. | Report the measured fixture and Synthea results as regression checks. A same-model live comparison needs a configured Claude account and an approved ontology. |
+
+## Change gate
+
+- Compare the executable metric and the role's effective access when selecting plans. A description edit can skip SQL. Missing dependency metadata runs the full registered suite.
+- Split answer changes from access changes. Reviewers can accept a change to a number. For an access regression, publish is blocked and the report carries only the case ID, role, and access statuses.
+- Keep computation outside the SQLite write transaction. Pin the DuckDB source during replay and check that the candidate and suite are still current before storing evidence. Publication binds that evidence to the same parent, candidate, source fingerprint, suite, and policy version.
+- Measure projection startup separately when interpreting replay latency. Fewer plans reduced the work in the seeded comparison, while cases opening both role projections still took about two seconds in either mode.

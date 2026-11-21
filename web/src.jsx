@@ -130,6 +130,35 @@ function Inspector({change, onDecide, busy, published}) {
   </section>;
 }
 
+function ChangeGate({batch, ready, busy, onCheck, onAcknowledge}) {
+  const report = batch.gate;
+  return <section className="change-gate" aria-label="Change gate">
+    <div className="gate-head">
+      <div><h2>Change gate</h2>
+        <p>{report ? (report.blocked ? 'Publication blocked' :
+          report.findings.length ? (report.acknowledged ? 'Answer changes acknowledged' : 'Answer changes require acknowledgement') :
+          'No answer or access changes detected') : 'Replay saved answers against this proposal.'}</p>
+      </div>
+      {!batch.published && <button className="secondary" disabled={busy || !ready} onClick={onCheck}>Run gate</button>}
+    </div>
+    {report && <>
+      <p className="gate-meta">{report.checked} of {report.cases} plans replayed · {report.mode === 'fallback' ? 'Full replay due to incomplete dependencies' : report.mode}</p>
+      {report.failed_invariants.length > 0 && <p className="gate-meta">Failed validation: {report.failed_invariants.map(x => x.name).join(', ')}</p>}
+      {report.findings.length > 0 && <table className="gate-table">
+        <thead><tr><th scope="col">Saved plan</th><th scope="col">Role</th><th scope="col">Current</th><th scope="col">Proposed</th><th scope="col">Finding</th></tr></thead>
+        <tbody>{report.findings.map(row => <tr key={row.id}>
+          <th scope="row">{row.id}</th><td>{row.role}</td>
+          <td>{typeof row.before === 'number' ? number.format(row.before) : row.before ?? '—'}</td>
+          <td>{typeof row.after === 'number' ? number.format(row.after) : row.after ?? '—'}</td>
+          <td>{row.status === 'answer_changed' ? 'Answer changed' : row.status === 'access_changed' ? 'Access changed' : 'Execution error'}</td>
+        </tr>)}</tbody>
+      </table>}
+      {!batch.published && !report.blocked && !report.acknowledged && report.findings.length > 0 &&
+        <button className="secondary gate-ack" disabled={busy} onClick={() => onAcknowledge(report.evidence_key)}>Acknowledge answer changes</button>}
+    </>}
+  </section>;
+}
+
 function Review() {
   const [input, setInput] = useState(new URLSearchParams(location.search).get('batch') || '1');
   const [batch, setBatch] = useState(null);
@@ -166,6 +195,10 @@ function Review() {
   const hits = groups.flatMap(group => group.changes);
   const current = hits.find(c => c.id === selected) ?? hits[0];
   const published = batch?.published != null;
+  const ready = approved > 0 && decided === changes.length;
+  const needsGate = batch?.parent > 0;
+  const gate = batch?.gate;
+  const gateReady = !needsGate || (gate && !gate.blocked && (!gate.findings.length || gate.acknowledged));
 
   function decide(id, decision) {
     setSelected(id);
@@ -213,7 +246,7 @@ function Review() {
       <section className="hero">
         <div><p className="context">{batch ? 'Batch ' + batch.id + ' / Base version ' + batch.parent : 'Ontology versions'}</p>
           <h1>Proposal review</h1></div>
-        <button className="primary publish" disabled={busy || published || !approved || decided !== changes.length}
+        <button className="primary publish" disabled={busy || published || !ready || !gateReady}
           onClick={() => act(async () => {await api('publish', {batch: batch.id}); await load(batch.id);})}>
           {published ? 'Version ' + batch.published + ' published' : 'Publish version'}
         </button>
@@ -226,6 +259,9 @@ function Review() {
         <div><strong>{decided - approved}</strong><span> Rejected</span></div>
         <div><strong>{blocked}</strong><span> Blocked</span></div>
       </section>}
+      {needsGate && <ChangeGate batch={batch} ready={ready} busy={busy}
+        onCheck={() => act(async () => {await api('gate', {batch: batch.id}); await load(batch.id);})}
+        onAcknowledge={key => act(async () => {await api('gate/acknowledge', {batch: batch.id, key}); await load(batch.id);})}/>}
       <div className="workspace">
         <section className="queue" aria-label="Change queue">
           <div className="queue-head">

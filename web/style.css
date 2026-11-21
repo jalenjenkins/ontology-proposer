@@ -168,3 +168,14 @@ pre { color: #e9eddf; background: #2d342a; border-radius: 2px; }
   .inspector { position: static; }
   .queue-scroll { max-height: 215px; }
 }
+
+.change-gate { border: 1px solid var(--line); border-top: 2px solid #343d2d; background: #fbfaf5; padding: 14px; margin-bottom: 18px; overflow: auto; }
+.gate-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.gate-head h2 { font-size: 18px; }
+.gate-head p, .gate-meta { color: var(--muted); font-size: 13px; }
+.gate-meta { margin: 8px 0; }
+.gate-table { border-collapse: collapse; width: 100%; min-width: 420px; font-size: 13px; }
+.gate-table td, .gate-table th { text-align: left; border-bottom: 1px solid var(--line); padding: 5px 8px; }
+.gate-table thead { background: #edece2; }
+.gate-table td:nth-child(3), .gate-table td:nth-child(4) { font: 12px var(--mono); }
+.gate-ack { margin-top: 12px; }

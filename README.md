@@ -107,6 +107,36 @@ See the [Synthea questions](eval/synthea-questions.json), [fixture questions](ev
 
 Offline scores exercise a curated ontology and a deterministic planner. The schema-only adapter deliberately reproduces a claim-grain error. This is a regression benchmark for validation and verification. Live Claude accuracy is unmeasured.
 
+## Ontology change gate
+
+[Watch the recorded Synthea gate walkthrough](demo/ontology-change-gate.mp4).
+
+Use the gate to replay approved edits before publishing an update to an existing ontology. Bootstrap publication still uses the original per-change validation and review. The gate runs saved structured plans against the current and proposed definitions on the same DuckDB source. It compares each plan under its own role and never shows SQL, filter values, or result values for an access change.
+
+```sh
+python -m ontology --db synthea.duckdb --store gate-cost.sqlite gate-demo cost
+python -m ontology --db synthea.duckdb --store gate-cost.sqlite \
+  --gate-cases eval/synthea-gate-cases.json serve
+```
+
+Open batch 2 on a fresh store. Approve the two proposed changes, run the gate, and inspect the answer changes. Acknowledge the evidence and publish to intentionally change the metric. Repeat with a separate `gate-permissions.sqlite` store and the `permissions` scenario to see a blocked release. For CLI review, run `gate BATCH` with the same source and suite options. Pass the reported evidence key to `gate BATCH --acknowledge EVIDENCE_KEY` for an intended answer change.
+
+### Replay comparison
+
+Run `python -m ontology --db synthea.duckdb gate-compare`. The [saved local result](eval/synthea-gate-comparison.json) covers 12 plans over two roles.
+
+| Seeded proposal | Targeted checks | Full checks | Missed findings |
+| --- | ---: | ---: | ---: |
+| Cost definition | 3 | 12 | 0 |
+| Analyst visibility | 1 | 12 | 0 |
+| Description only | 0 | 12 | 0 |
+| Missing dependency metadata | 12 | 12 | 0 |
+| Fan-out join | 3 | 12 | 0 |
+
+The cost proposal switches from total claim cost to base encounter cost. The analyst total changes from 23,594,852.52 to 783,313.82 even though the proposed sum preserves encounter grain. The permissions proposal removes analyst visibility of the city property. The saved analyst plan changes from allowed to denied, while the corresponding admin plan still works.
+
+The targeted path compares the executable metric shape and effective role permissions before running SQL. Unknown dependency metadata triggers full replay. Publication binds the report to the parent, candidate, source file content, suite, and gate policy version. It rejects stale evidence, failed invariants, and access changes. Acknowledgements apply to a specific report. This is a deterministic gate for registered plans. Its coverage depends on what the suite contains. The cost and fan-out cases still opened projections for both roles, which dominated their wall time in this run.
+
 ## Local execution
 
 - `profile` reports table statistics scans, eligible join pairs, pruned pairs, exact probes, and wall time. `profile --exhaustive` runs every eligible exact probe for comparison. The shortlist uses a hash-bucket upper bound and exact probes provide the reported evidence. On the documented Synthea snapshot, three local runs preserved all 56 candidate joins, cut exact probes from 1,446 to 586, and reduced median profiling time from 12.47 s to 10.64 s.

@@ -1,0 +1,283 @@
+{
+  "cost": {
+    "targeted": {
+      "mode": "targeted",
+      "cases": 12,
+      "checked": 3,
+      "elapsed_ms": 2096.91,
+      "blocked": false,
+      "failed_invariants": [],
+      "findings": [
+        {
+          "id": "cost-total",
+          "role": "analyst",
+          "status": "answer_changed",
+          "metric": "encounter_claim_cost",
+          "before": 23594852.520000383,
+          "after": 783313.8200000263
+        },
+        {
+          "id": "cost-urgent",
+          "role": "analyst",
+          "status": "answer_changed",
+          "metric": "encounter_claim_cost",
+          "before": 532590.0099999984,
+          "after": 75139.6600000007
+        },
+        {
+          "id": "cost-admin",
+          "role": "admin",
+          "status": "answer_changed",
+          "metric": "encounter_claim_cost",
+          "before": 23594852.520000383,
+          "after": 783313.8200000263
+        }
+      ]
+    },
+    "full": {
+      "mode": "full",
+      "cases": 12,
+      "checked": 12,
+      "elapsed_ms": 2068.31,
+      "blocked": false,
+      "failed_invariants": [],
+      "findings": [
+        {
+          "id": "cost-total",
+          "role": "analyst",
+          "status": "answer_changed",
+          "metric": "encounter_claim_cost",
+          "before": 23594852.520000383,
+          "after": 783313.8200000263
+        },
+        {
+          "id": "cost-urgent",
+          "role": "analyst",
+          "status": "answer_changed",
+          "metric": "encounter_claim_cost",
+          "before": 532590.0099999984,
+          "after": 75139.6600000007
+        },
+        {
+          "id": "cost-admin",
+          "role": "admin",
+          "status": "answer_changed",
+          "metric": "encounter_claim_cost",
+          "before": 23594852.520000383,
+          "after": 783313.8200000263
+        }
+      ]
+    },
+    "missed": []
+  },
+  "permissions": {
+    "targeted": {
+      "mode": "targeted",
+      "cases": 12,
+      "checked": 1,
+      "elapsed_ms": 498.44,
+      "blocked": true,
+      "failed_invariants": [],
+      "findings": [
+        {
+          "id": "patient-boston",
+          "role": "analyst",
+          "status": "access_changed",
+          "before": "ok",
+          "after": "denied"
+        }
+      ]
+    },
+    "full": {
+      "mode": "full",
+      "cases": 12,
+      "checked": 12,
+      "elapsed_ms": 2001.86,
+      "blocked": true,
+      "failed_invariants": [],
+      "findings": [
+        {
+          "id": "patient-boston",
+          "role": "analyst",
+          "status": "access_changed",
+          "before": "ok",
+          "after": "denied"
+        }
+      ]
+    },
+    "missed": []
+  },
+  "harmless": {
+    "targeted": {
+      "mode": "targeted",
+      "cases": 12,
+      "checked": 0,
+      "elapsed_ms": 32.21,
+      "blocked": false,
+      "failed_invariants": [],
+      "findings": []
+    },
+    "full": {
+      "mode": "full",
+      "cases": 12,
+      "checked": 12,
+      "elapsed_ms": 1984.76,
+      "blocked": false,
+      "failed_invariants": [],
+      "findings": []
+    },
+    "missed": []
+  },
+  "untracked": {
+    "targeted": {
+      "mode": "fallback",
+      "cases": 12,
+      "checked": 12,
+      "elapsed_ms": 2120.37,
+      "blocked": false,
+      "failed_invariants": [],
+      "findings": [
+        {
+          "id": "cost-total",
+          "role": "analyst",
+          "status": "answer_changed",
+          "metric": "encounter_claim_cost",
+          "before": 23594852.520000383,
+          "after": 1296189.9000000055
+        },
+        {
+          "id": "cost-urgent",
+          "role": "analyst",
+          "status": "answer_changed",
+          "metric": "encounter_claim_cost",
+          "before": 532590.0099999984,
+          "after": null
+        },
+        {
+          "id": "cost-admin",
+          "role": "admin",
+          "status": "answer_changed",
+          "metric": "encounter_claim_cost",
+          "before": 23594852.520000383,
+          "after": 1296189.9000000055
+        }
+      ]
+    },
+    "full": {
+      "mode": "full",
+      "cases": 12,
+      "checked": 12,
+      "elapsed_ms": 2095.39,
+      "blocked": false,
+      "failed_invariants": [],
+      "findings": [
+        {
+          "id": "cost-total",
+          "role": "analyst",
+          "status": "answer_changed",
+          "metric": "encounter_claim_cost",
+          "before": 23594852.520000383,
+          "after": 1296189.9000000055
+        },
+        {
+          "id": "cost-urgent",
+          "role": "analyst",
+          "status": "answer_changed",
+          "metric": "encounter_claim_cost",
+          "before": 532590.0099999984,
+          "after": null
+        },
+        {
+          "id": "cost-admin",
+          "role": "admin",
+          "status": "answer_changed",
+          "metric": "encounter_claim_cost",
+          "before": 23594852.520000383,
+          "after": 1296189.9000000055
+        }
+      ]
+    },
+    "missed": []
+  },
+  "fanout": {
+    "targeted": {
+      "mode": "targeted",
+      "cases": 12,
+      "checked": 3,
+      "elapsed_ms": 2061.6,
+      "blocked": true,
+      "failed_invariants": [
+        {
+          "kind": "metric",
+          "name": "encounter_claim_cost"
+        }
+      ],
+      "findings": [
+        {
+          "id": "cost-total",
+          "role": "analyst",
+          "status": "answer_changed",
+          "metric": "encounter_claim_cost",
+          "before": 23594852.520000383,
+          "after": 1385833187.6201673
+        },
+        {
+          "id": "cost-urgent",
+          "role": "analyst",
+          "status": "answer_changed",
+          "metric": "encounter_claim_cost",
+          "before": 532590.0099999984,
+          "after": 26643452.28000295
+        },
+        {
+          "id": "cost-admin",
+          "role": "admin",
+          "status": "answer_changed",
+          "metric": "encounter_claim_cost",
+          "before": 23594852.520000383,
+          "after": 1385833187.6201673
+        }
+      ]
+    },
+    "full": {
+      "mode": "full",
+      "cases": 12,
+      "checked": 12,
+      "elapsed_ms": 2118.58,
+      "blocked": true,
+      "failed_invariants": [
+        {
+          "kind": "metric",
+          "name": "encounter_claim_cost"
+        }
+      ],
+      "findings": [
+        {
+          "id": "cost-total",
+          "role": "analyst",
+          "status": "answer_changed",
+          "metric": "encounter_claim_cost",
+          "before": 23594852.520000383,
+          "after": 1385833187.6201673
+        },
+        {
+          "id": "cost-urgent",
+          "role": "analyst",
+          "status": "answer_changed",
+          "metric": "encounter_claim_cost",
+          "before": 532590.0099999984,
+          "after": 26643452.28000295
+        },
+        {
+          "id": "cost-admin",
+          "role": "admin",
+          "status": "answer_changed",
+          "metric": "encounter_claim_cost",
+          "before": 23594852.520000383,
+          "after": 1385833187.6201673
+        }
+      ]
+    },
+    "missed": []
+  }
+}

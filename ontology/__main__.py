@@ -14,6 +14,7 @@ def main():
     parser = argparse.ArgumentParser(description="Review and query a versioned ontology")
     parser.add_argument("--db", default="demo.duckdb")
     parser.add_argument("--store", default="review.sqlite")
+    parser.add_argument("--gate-cases", type=Path, help="Saved plans required for updates to published ontologies")
     commands = parser.add_subparsers(dest="command", required=True)
     for name in ("fixture", "profile", "review", "publish", "serve", "demo"):
         sub = commands.add_parser(name)
@@ -45,6 +46,14 @@ def main():
     benchmark.add_argument("--check-gold", action="store_true", help="Check holdout against source and analyst data")
     benchmark.add_argument("--output", type=Path)
     benchmark.add_argument("--baseline", type=Path)
+    gate = commands.add_parser("gate")
+    gate.add_argument("batch", type=int)
+    action = gate.add_mutually_exclusive_group()
+    action.add_argument("--full", action="store_true")
+    action.add_argument("--acknowledge", metavar="EVIDENCE_KEY")
+    gate_demo = commands.add_parser("gate-demo")
+    gate_demo.add_argument("scenario", choices=("cost", "permissions"))
+    commands.add_parser("gate-compare")
     args = parser.parse_args()
     cmd = args.command
     if cmd == "fixture":
@@ -64,7 +73,17 @@ def main():
         store.decide(args.change, args.decision)
         return dict(decision=args.decision)
     if cmd == "publish":
-        return dict(version=store.publish(args.batch))
+        return dict(version=store.publish(args.batch, args.db, args.gate_cases))
+    if cmd == "gate":
+        if args.acknowledge:
+            store.acknowledge_gate(args.batch, args.acknowledge)
+            return dict(acknowledged=True)
+        return store.check_gate(args.batch, args.db, args.gate_cases, args.full)
+    if cmd in {"gate-demo", "gate-compare"}:
+        from ontology.gate_demo import compare_demo, stage_demo
+        if cmd == "gate-compare":
+            return compare_demo(args.db)
+        return stage_demo(args.db, store, args.scenario)
     if cmd == "query":
         version, snapshot = store.versioned_snapshot(args.version)
         objects = visible(snapshot, args.role)
@@ -95,7 +114,7 @@ def main():
                 for name, report in results["results"].items()} | {"regressions": results.get("regressions", {})}
     if cmd == "serve":
         from ontology.server import serve
-        return serve(store, args.port)
+        return serve(store, args.port, args.db, args.gate_cases)
     if cmd == "demo":
         demo(args.db)
         batch = store.stage(args.db, fixture_proposal(args.db))

@@ -4,7 +4,7 @@ from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
 
-def serve(store, port):
+def serve(store, port, path=None, suite=None):
     class Handler(SimpleHTTPRequestHandler):
         def respond(self, fn):
             try:
@@ -40,8 +40,13 @@ def serve(store, port):
                 if self.path == "/api/decide":
                     store.decide(int(data["id"]), data["decision"])
                     return {"ok": True}
+                if self.path == "/api/gate":
+                    return store.check_gate(int(data["batch"]), path, suite)
+                if self.path == "/api/gate/acknowledge":
+                    store.acknowledge_gate(int(data["batch"]), data["key"])
+                    return {"ok": True}
                 if self.path == "/api/publish":
-                    return {"version": store.publish(int(data["batch"]))}
+                    return {"version": store.publish(int(data["batch"]), path, suite)}
                 raise ValueError("Unknown operation")
 
             self.respond(mutate)
