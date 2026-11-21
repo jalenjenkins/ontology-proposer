@@ -23,7 +23,7 @@ flowchart LR
     X --> E[Answer or disagreement]
 ```
 
-Watch the [two-minute demo](demo/ontology-proposer.mp4) for the Synthea import, review, publication, and analyst query.
+Watch the [1:51 recorded walkthrough](demo/ontology-proposer-walkthrough.mp4) for profiling, proposal review, publication, and analyst verification on the local DuckDB healthcare fixture. The recording includes narration and English captions.
 
 ## Run locally
 
