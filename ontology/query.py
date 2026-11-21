@@ -25,7 +25,16 @@ def live_answer(db, question, objects=None, verify=False, *, paired=False):
             {"question": question, "ontology": objects},
             [submit, tool("abstain")],
             lambda name, args: (args if name == "submit" else None, True))
-        return abstain() if plan is None else execute_plan(db, objects, plan, verify, paired=paired)
+        if plan is None:
+            return abstain()
+        try:
+            answer = execute_plan(db, objects, plan, verify, paired=paired)
+        except (KeyError, ValueError, TypeError, duckdb.Error) as exc:
+            if not paired:
+                raise
+            error = dict(status="error", error=type(exc).__name__, detail=str(exc), plan=plan)
+            return error, error
+        return tuple(dict(outcome, plan=plan) for outcome in answer) if paired else answer
 
     def generate(exclude=None):
         return messages(
@@ -46,15 +55,28 @@ def live_answer(db, question, objects=None, verify=False, *, paired=False):
     sql = generate()
     if sql is None:
         return abstain()
-    primary = dict(status="ok", value=scalar(sql), sql=sql)
+    try:
+        primary = dict(status="ok", value=scalar(sql), sql=sql)
+    except (ValueError, TypeError, duckdb.Error, SqlglotError) as exc:
+        if not paired:
+            raise
+        error = dict(status="error", error=type(exc).__name__, detail=str(exc), sql=sql)
+        return error, error
     checked = primary
     if verify or paired:
         alternate = generate(sql)
-        try:
-            agrees = (alternate is not None and alternate.strip().lower() != sql.strip().lower()
-                      and equivalent(primary["value"], scalar(alternate)))
-        except (ValueError, TypeError, duckdb.Error, SqlglotError):
-            agrees = False
-        if not agrees:
-            checked = dict(status="disagreement", sql=sql)
+        reason = None
+        if alternate is None:
+            reason = "alternate_abstained"
+        elif alternate.strip().lower() == sql.strip().lower():
+            reason = "same_sql"
+        else:
+            try:
+                alternate_value = scalar(alternate)
+                if not equivalent(primary["value"], alternate_value):
+                    reason = "different_value"
+            except (ValueError, TypeError, duckdb.Error, SqlglotError):
+                reason = "invalid_alternate"
+        if reason:
+            checked = dict(status="disagreement", sql=sql, verifier_reason=reason, alternate_sql=alternate)
     return (primary, checked) if paired else checked

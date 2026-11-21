@@ -55,16 +55,53 @@ def offline_answer(db, question, objects, semantic, verify, synthea=False):
     return dict(status="ok", value=primary, sql=sql)
 
 
-def evaluate(path, objects, live=False, synthea=False):
+def holdout_gold(path, objects):
+    cases = json.loads(QUESTIONS.with_name("synthea-holdout.json").read_text())
+    with open_db(path, True) as raw, scoped(path, objects) as projection:
+        for case in cases:
+            for session in (raw, projection):
+                result = read_sql(session, case["gold_sql"])
+                if len(result) != 1 or len(result[0]) != 1 or not equivalent(result[0][0], case["expected"]):
+                    raise ValueError(f"Holdout gold mismatch for {case['id']} on this snapshot or role")
+    return cases
+
+
+def failure_breakdown(rows):
+    counts = {}
+    misses = {}
+    for row in rows:
+        group = counts.setdefault(row["slice"], {})
+        outcome = "correct" if row["correct"] else ("wrong_value" if row["status"] == "ok" else row["status"])
+        group[outcome] = group.get(outcome, 0) + 1
+        if outcome != "correct":
+            misses.setdefault(outcome, []).append(row["id"])
+    return dict(by_slice=counts, cases_by_failure=misses)
+
+
+def verification_impact(single, verified):
+    withheld = [before for before, after in zip(single, verified)
+                if before["status"] == "ok" and after["status"] != "ok"]
+    return dict(correct_withheld=[row["id"] for row in withheld if row["correct"]],
+                wrong_withheld=[row["id"] for row in withheld if not row["correct"]],
+                wrong_returned=[row["id"] for row in verified if row["status"] == "ok" and not row["correct"]])
+
+
+def evaluate(path, objects, live=False, synthea=False, holdout=False):
+    if holdout and not live:
+        raise ValueError("Use --live for the holdout or --check-gold to validate its reference answers")
+
     if live and not all(os.environ.get(name) for name in ("ANTHROPIC_API_KEY", "ANTHROPIC_MODEL")):
         raise ValueError("Set ANTHROPIC_API_KEY and ANTHROPIC_MODEL before running a live eval")
     if live and not objects:
         raise ValueError("Publish an ontology before running a live eval")
-    questions = QUESTIONS.with_name("synthea-questions.json") if synthea else QUESTIONS
-    cases = json.loads(questions.read_text())
-    with open_db(path, True) as raw:
-        expected = [read_sql(raw, case["gold_sql"])[0][0] for case in cases]
     objects = visible(objects, "analyst")
+    if holdout:
+        cases = holdout_gold(path, objects)
+    else:
+        questions = QUESTIONS.with_name("synthea-questions.json") if synthea else QUESTIONS
+        cases = json.loads(questions.read_text())
+        with open_db(path, True) as raw:
+            cases = [dict(case, expected=read_sql(raw, case["gold_sql"])[0][0]) for case in cases]
     results = {}
     with scoped(path, objects) as db:
         for semantic in (False, True):
@@ -72,7 +109,8 @@ def evaluate(path, objects, live=False, synthea=False):
             if live:
                 print(f"Running paired {label} evaluation ({len(cases)} questions)", file=sys.stderr, flush=True)
             single, verified = [], []
-            for case, gold in zip(cases, expected):
+            for case in cases:
+                gold = case["expected"]
                 try:
                     if live:
                         outcomes = live_answer(db, case["question"], objects if semantic else None, paired=True)
@@ -86,14 +124,27 @@ def evaluate(path, objects, live=False, synthea=False):
                     outcomes = error, error
                 for rows, result in zip((single, verified), outcomes):
                     correct = result["status"] == "ok" and equivalent(result["value"], gold)
-                    rows.append(dict(id=case["id"], expected=gold, correct=correct, **result))
+                    row = dict(id=case["id"], expected=gold, correct=correct, **result)
+                    if holdout:
+                        row.update({key: case[key] for key in ("question", "slice", "ontology_in_scope")})
+                    rows.append(row)
             for suffix, rows in (("single", single), ("verified", verified)):
                 correct = sum(row["correct"] for row in rows)
                 returned = sum(row["status"] == "ok" for row in rows)
                 results[f"{label}_{suffix}"] = dict(
                     correct=correct, total=len(rows), accuracy=correct / len(rows),
                     returned=returned, wrong_returned=returned - correct, cases=rows)
-    report = dict(mode="live" if live else "offline", dataset="synthea" if synthea else "fixture", results=results)
+    report = dict(mode="live" if live else "offline",
+                  dataset="synthea_holdout" if holdout else ("synthea" if synthea else "fixture"), results=results)
+    if holdout:
+        for result in results.values():
+            result["failures"] = failure_breakdown(result["cases"])
+            in_scope = [row for row in result["cases"] if row["ontology_in_scope"]]
+            result["ontology_in_scope"] = dict(correct=sum(row["correct"] for row in in_scope), total=len(in_scope))
+        report["verification_impact"] = {
+            label: verification_impact(results[f"{label}_single"]["cases"], results[f"{label}_verified"]["cases"])
+            for label in ("schema", "ontology")
+        }
     if live:
         report["model"] = os.environ["ANTHROPIC_MODEL"]
     return report

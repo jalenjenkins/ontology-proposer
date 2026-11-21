@@ -2,7 +2,7 @@ import argparse
 import json
 from pathlib import Path
 
-from ontology.benchmark import compare, evaluate
+from ontology.benchmark import compare, evaluate, holdout_gold
 from ontology.data import demo, load_csv, profile
 from ontology.proposer import fixture_proposal, propose, synthea_proposal
 from ontology.query import live_answer
@@ -39,7 +39,10 @@ def main():
     query.add_argument("--cache-dir", type=Path, default=Path(".ontology-cache"))
     benchmark = commands.add_parser("eval")
     benchmark.add_argument("--live", action="store_true")
-    benchmark.add_argument("--synthea", action="store_true")
+    dataset = benchmark.add_mutually_exclusive_group()
+    dataset.add_argument("--synthea", action="store_true")
+    dataset.add_argument("--holdout", action="store_true", help="Use the frozen Synthea holdout")
+    benchmark.add_argument("--check-gold", action="store_true", help="Check holdout against source and analyst data")
     benchmark.add_argument("--output", type=Path)
     benchmark.add_argument("--baseline", type=Path)
     args = parser.parse_args()
@@ -70,11 +73,24 @@ def main():
                 return live_answer(db, args.request, objects, args.verify)
             return execute_plan(db, objects, json.loads(args.request), args.verify)
     if cmd == "eval":
-        results = evaluate(args.db, store.snapshot(), args.live, args.synthea)
+        version, snapshot = store.versioned_snapshot()
+        if args.check_gold:
+            if not args.holdout or args.live:
+                raise ValueError("--check-gold requires --holdout without --live")
+            cases = holdout_gold(args.db, visible(snapshot, "analyst"))
+            return dict(dataset="synthea_holdout", gold_cases_verified=len(cases), ontology_version=version)
+        results = evaluate(args.db, snapshot, args.live, args.synthea, args.holdout)
+        if args.holdout:
+            results["ontology_version"] = version
         if args.baseline:
             results["regressions"] = compare(results, json.loads(args.baseline.read_text()))
         if args.output:
             args.output.write_text(json.dumps(results, indent=2, default=str) + "\n")
+        if args.holdout:
+            return {key: value for key, value in results.items() if key != "results"} | {
+                "results": {name: {k: v for k, v in summary.items() if k != "cases"}
+                            for name, summary in results["results"].items()}
+            }
         return {name: {k: v for k, v in report.items() if k != "cases"}
                 for name, report in results["results"].items()} | {"regressions": results.get("regressions", {})}
     if cmd == "serve":

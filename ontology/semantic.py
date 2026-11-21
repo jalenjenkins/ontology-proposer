@@ -187,7 +187,7 @@ def execute_plan(db, objects, plan, verify=False, *, paired=False):
     primary = dict(status="ok", value=value, sql=sql, params=params)
     checked = primary
     if (verify or paired) and not equivalent(value, independent(db, metric, where)):
-        checked = dict(status="disagreement", sql=sql)
+        checked = dict(status="disagreement", sql=sql, verifier_reason="different_value")
     return (primary, checked) if paired else checked
 
 

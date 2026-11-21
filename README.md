@@ -82,6 +82,20 @@ The four configurations share primary answers and can make up to 96 billable mod
 
 ## Evaluation
 
+### Synthea holdout
+
+The [24 frozen questions](eval/synthea-holdout.json) use different intents or filter values from the development suite. Twelve fit the reference ontology's current metric and filter grammar. Twelve test distinct counts, transaction grain, joins, compound filters, or extrema. The same Synthea snapshot and analyst-visible data are used for both conditions. Gold values were cross-checked independently from the original CSVs.
+
+```sh
+python -m ontology --db synthea.duckdb --store synthea.sqlite eval --holdout --check-gold
+python -m ontology --db synthea.duckdb --store synthea.sqlite eval --holdout --live \
+  --output eval/synthea-holdout-live.json
+```
+
+The live report includes case-level SQL or plans, scores within the ontology's declared coverage, failure categories by question slice, and the IDs of correct and wrong answers withheld by verification. The 24-question holdout needs at most 72 model calls. Use the reviewed Synthea reference ontology for comparable runs.
+
+### Development benchmark
+
 See the [Synthea questions](eval/synthea-questions.json), [fixture questions](eval/questions.json), and case-level JSON reports in [eval](eval). Each question has a separately specified gold SQL query. Accuracy counts withheld answers as incorrect. Wrong returned answers and coverage distinguish a confident error from a disagreement. Use `--output` to save a report and `--baseline` to report IDs that went from correct to incorrect.
 
 | Configuration | Synthea correct | Synthea wrong returned | Fixture correct | Fixture wrong returned |

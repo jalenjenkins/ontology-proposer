@@ -1,0 +1,194 @@
+[
+  {
+    "id": "h01",
+    "slice": "paraphrase",
+    "ontology_in_scope": true,
+    "question": "How many people in the patient registry list Cambridge as their city?",
+    "gold_sql": "SELECT COUNT(*) FROM patients WHERE CITY = 'Cambridge'",
+    "expected": 3
+  },
+  {
+    "id": "h02",
+    "slice": "paraphrase",
+    "ontology_in_scope": true,
+    "question": "What is the number of Nantucket residents in the patient registry?",
+    "gold_sql": "SELECT COUNT(*) FROM patients WHERE CITY = 'Nantucket'",
+    "expected": 2
+  },
+  {
+    "id": "h03",
+    "slice": "paraphrase",
+    "ontology_in_scope": true,
+    "question": "How many appointments were classified as home encounters?",
+    "gold_sql": "SELECT COUNT(*) FROM encounters WHERE ENCOUNTERCLASS = 'home'",
+    "expected": 31
+  },
+  {
+    "id": "h04",
+    "slice": "paraphrase",
+    "ontology_in_scope": true,
+    "question": "How many encounters were classified as hospice?",
+    "gold_sql": "SELECT COUNT(*) FROM encounters WHERE ENCOUNTERCLASS = 'hospice'",
+    "expected": 18
+  },
+  {
+    "id": "h05",
+    "slice": "paraphrase",
+    "ontology_in_scope": true,
+    "question": "How many appointments took place virtually, based on their encounter class?",
+    "gold_sql": "SELECT COUNT(*) FROM encounters WHERE ENCOUNTERCLASS = 'virtual'",
+    "expected": 28
+  },
+  {
+    "id": "h06",
+    "slice": "paraphrase",
+    "ontology_in_scope": true,
+    "question": "How many encounters have the exact encounter class dental?",
+    "gold_sql": "SELECT COUNT(*) FROM encounters WHERE ENCOUNTERCLASS = 'dental'",
+    "expected": 0
+  },
+  {
+    "id": "h07",
+    "slice": "cost_at_encounter_grain",
+    "ontology_in_scope": true,
+    "question": "Add up the recorded total claim cost across urgent-care encounters. Return the total, counting each encounter once.",
+    "gold_sql": "SELECT SUM(TOTAL_CLAIM_COST) FROM encounters WHERE ENCOUNTERCLASS = 'urgentcare'",
+    "expected": 532590.0099999984
+  },
+  {
+    "id": "h08",
+    "slice": "cost_at_encounter_grain",
+    "ontology_in_scope": true,
+    "question": "What is the sum of recorded total claim costs for skilled nursing facility encounters, identified by class snf?",
+    "gold_sql": "SELECT SUM(TOTAL_CLAIM_COST) FROM encounters WHERE ENCOUNTERCLASS = 'snf'",
+    "expected": 251659.72
+  },
+  {
+    "id": "h09",
+    "slice": "cost_at_encounter_grain",
+    "ontology_in_scope": true,
+    "question": "Across home visits, what was the mean recorded total claim cost per encounter?",
+    "gold_sql": "SELECT AVG(TOTAL_CLAIM_COST) FROM encounters WHERE ENCOUNTERCLASS = 'home'",
+    "expected": 622.5525806451616
+  },
+  {
+    "id": "h10",
+    "slice": "cost_at_encounter_grain",
+    "ontology_in_scope": true,
+    "question": "Among hospice encounters, what is the average of the recorded total claim cost?",
+    "gold_sql": "SELECT AVG(TOTAL_CLAIM_COST) FROM encounters WHERE ENCOUNTERCLASS = 'hospice'",
+    "expected": 11689.463333333331
+  },
+  {
+    "id": "h11",
+    "slice": "cost_at_encounter_grain",
+    "ontology_in_scope": true,
+    "question": "What is the total recorded claim cost for hospice encounters, counting every encounter once?",
+    "gold_sql": "SELECT SUM(TOTAL_CLAIM_COST) FROM encounters WHERE ENCOUNTERCLASS = 'hospice'",
+    "expected": 210410.33999999997
+  },
+  {
+    "id": "h12",
+    "slice": "cost_at_encounter_grain",
+    "ontology_in_scope": true,
+    "question": "What is the mean recorded total claim cost per skilled nursing facility encounter, using encounter class snf?",
+    "gold_sql": "SELECT AVG(TOTAL_CLAIM_COST) FROM encounters WHERE ENCOUNTERCLASS = 'snf'",
+    "expected": 13245.24842105263
+  },
+  {
+    "id": "h13",
+    "slice": "distinct_and_row_grain",
+    "ontology_in_scope": false,
+    "question": "How many distinct patients had at least one emergency encounter?",
+    "gold_sql": "SELECT COUNT(DISTINCT PATIENT) FROM encounters WHERE ENCOUNTERCLASS = 'emergency'",
+    "expected": 85
+  },
+  {
+    "id": "h14",
+    "slice": "distinct_and_row_grain",
+    "ontology_in_scope": false,
+    "question": "How many separate appointments are represented by claims whose first status is CLOSED?",
+    "gold_sql": "SELECT COUNT(DISTINCT APPOINTMENTID) FROM claims WHERE STATUS1 = 'CLOSED'",
+    "expected": 6743
+  },
+  {
+    "id": "h15",
+    "slice": "distinct_and_row_grain",
+    "ontology_in_scope": false,
+    "question": "How many individual claim-transaction rows have type PAYMENT?",
+    "gold_sql": "SELECT COUNT(*) FROM claims_transactions WHERE TYPE = 'PAYMENT'",
+    "expected": 61664
+  },
+  {
+    "id": "h16",
+    "slice": "distinct_and_row_grain",
+    "ontology_in_scope": false,
+    "question": "How many distinct claims are represented by at least one CHARGE transaction?",
+    "gold_sql": "SELECT COUNT(DISTINCT CLAIMID) FROM claims_transactions WHERE TYPE = 'CHARGE'",
+    "expected": 14816
+  },
+  {
+    "id": "h17",
+    "slice": "cross_table",
+    "ontology_in_scope": false,
+    "question": "How many emergency encounters were recorded for Boston patients? Use the city in the patient registry.",
+    "gold_sql": "SELECT COUNT(*) FROM encounters e JOIN patients p ON p.Id = e.PATIENT WHERE p.CITY = 'Boston' AND e.ENCOUNTERCLASS = 'emergency'",
+    "expected": 11
+  },
+  {
+    "id": "h18",
+    "slice": "cross_table",
+    "ontology_in_scope": false,
+    "question": "How many claims whose first status is CLOSED are linked to a virtual encounter?",
+    "gold_sql": "SELECT COUNT(*) FROM claims c JOIN encounters e ON e.Id = c.APPOINTMENTID WHERE c.STATUS1 = 'CLOSED' AND e.ENCOUNTERCLASS = 'virtual'",
+    "expected": 30
+  },
+  {
+    "id": "h19",
+    "slice": "cross_table",
+    "ontology_in_scope": false,
+    "question": "What is the sum of recorded encounter total claim costs for Plymouth patients, counting encounters once?",
+    "gold_sql": "SELECT SUM(e.TOTAL_CLAIM_COST) FROM encounters e JOIN patients p ON p.Id = e.PATIENT WHERE p.CITY = 'Plymouth'",
+    "expected": 841754.149999996
+  },
+  {
+    "id": "h20",
+    "slice": "cross_table",
+    "ontology_in_scope": false,
+    "question": "What is the total recorded claim cost across encounters that have at least one PAYMENT transaction? Count each qualifying encounter once.",
+    "gold_sql": "SELECT SUM(e.TOTAL_CLAIM_COST) FROM encounters e WHERE EXISTS (SELECT 1 FROM claims_transactions t WHERE t.APPOINTMENTID = e.Id AND t.TYPE = 'PAYMENT')",
+    "expected": 23594852.520000387
+  },
+  {
+    "id": "h21",
+    "slice": "compound_or_aggregation",
+    "ontology_in_scope": false,
+    "question": "How many patient records are listed as female and have Worcester as their city?",
+    "gold_sql": "SELECT COUNT(*) FROM patients WHERE GENDER = 'F' AND CITY = 'Worcester'",
+    "expected": 3
+  },
+  {
+    "id": "h22",
+    "slice": "compound_or_aggregation",
+    "ontology_in_scope": false,
+    "question": "How many encounters were either virtual or performed at home?",
+    "gold_sql": "SELECT COUNT(*) FROM encounters WHERE ENCOUNTERCLASS IN ('virtual', 'home')",
+    "expected": 59
+  },
+  {
+    "id": "h23",
+    "slice": "compound_or_aggregation",
+    "ontology_in_scope": false,
+    "question": "What is the highest recorded total claim cost for an emergency encounter?",
+    "gold_sql": "SELECT MAX(TOTAL_CLAIM_COST) FROM encounters WHERE ENCOUNTERCLASS = 'emergency'",
+    "expected": 132723.85
+  },
+  {
+    "id": "h24",
+    "slice": "compound_or_aggregation",
+    "ontology_in_scope": false,
+    "question": "What is the lowest recorded total claim cost for an inpatient encounter?",
+    "gold_sql": "SELECT MIN(TOTAL_CLAIM_COST) FROM encounters WHERE ENCOUNTERCLASS = 'inpatient'",
+    "expected": 87.71
+  }
+]
