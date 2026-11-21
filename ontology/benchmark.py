@@ -1,4 +1,7 @@
 import json
+import os
+import sys
+from urllib.error import URLError
 import re
 from pathlib import Path
 
@@ -53,6 +56,10 @@ def offline_answer(db, question, objects, semantic, verify, synthea=False):
 
 
 def evaluate(path, objects, live=False, synthea=False):
+    if live and not all(os.environ.get(name) for name in ("ANTHROPIC_API_KEY", "ANTHROPIC_MODEL")):
+        raise ValueError("Set ANTHROPIC_API_KEY and ANTHROPIC_MODEL before running a live eval")
+    if live and not objects:
+        raise ValueError("Publish an ontology before running a live eval")
     questions = QUESTIONS.with_name("synthea-questions.json") if synthea else QUESTIONS
     cases = json.loads(questions.read_text())
     with open_db(path, True) as raw:
@@ -63,12 +70,16 @@ def evaluate(path, objects, live=False, synthea=False):
         for semantic in (False, True):
             for verify in (False, True):
                 key = f"{'ontology' if semantic else 'schema'}_{'verified' if verify else 'single'}"
+                if live:
+                    print(f"Running {key} ({len(cases)} questions)", file=sys.stderr, flush=True)
                 rows = []
                 for case, gold in zip(cases, expected):
                     try:
                         answer = (live_answer(db, case["question"], objects if semantic else None, verify)
                                   if live else offline_answer(db, case["question"], objects, semantic, verify, synthea))
                         correct = answer["status"] == "ok" and equivalent(answer["value"], gold)
+                    except (URLError, TimeoutError):
+                        raise
                     except Exception as exc:
                         answer, correct = dict(status="error", error=type(exc).__name__), False
                     rows.append(dict(id=case["id"], expected=gold, correct=correct, **answer))
@@ -76,7 +87,10 @@ def evaluate(path, objects, live=False, synthea=False):
                 returned = sum(row["status"] == "ok" for row in rows)
                 results[key] = dict(correct=correct, total=len(rows), accuracy=correct / len(rows),
                                     returned=returned, wrong_returned=returned-correct, cases=rows)
-    return dict(mode="live" if live else "offline", dataset="synthea" if synthea else "fixture", results=results)
+    report = dict(mode="live" if live else "offline", dataset="synthea" if synthea else "fixture", results=results)
+    if live:
+        report["model"] = os.environ["ANTHROPIC_MODEL"]
+    return report
 
 
 def compare(current, previous):

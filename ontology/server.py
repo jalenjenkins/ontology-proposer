@@ -21,6 +21,8 @@ def serve(store, port):
         def do_GET(self):
             if self.path.startswith("/api/batch/"):
                 self.respond(lambda: store.changes(int(self.path.rsplit("/", 1)[-1])))
+            elif self.path.startswith("/api/review/"):
+                self.respond(lambda: store.review(int(self.path.rsplit("/", 1)[-1])))
             else:
                 super().do_GET()
 

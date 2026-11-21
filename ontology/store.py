@@ -66,11 +66,23 @@ class Store:
                                [batch, json.dumps(payload, default=str), json.dumps(validate(path,obj), default=str)])
             return batch
 
+    def review(self, batch):
+        with self.connect() as db:
+            db.execute("begin")
+            row = db.execute("select parent,published from batches where id=?", [batch]).fetchone()
+            if row is None:
+                raise ValueError("Unknown batch")
+            return dict(id=batch, parent=row[0], published=row[1], changes=self._changes(db, batch))
+
     def changes(self, batch):
         with self.connect() as db:
-            return [dict(id=i, **json.loads(obj), validation=json.loads(result), decision=decision)
-                    for i, obj, result, decision in db.execute(
-                        "select id,object,validation,decision from changes where batch=? order by id", [batch])]
+            return self._changes(db, batch)
+
+    @staticmethod
+    def _changes(db, batch):
+        return [dict(id=i, **json.loads(obj), validation=json.loads(result), decision=decision)
+                for i, obj, result, decision in db.execute(
+                    "select id,object,validation,decision from changes where batch=? order by id", [batch])]
 
     def decide(self, change, decision):
         if decision not in {"approve", "reject"}:

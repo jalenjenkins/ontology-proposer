@@ -59,7 +59,26 @@ python -m ontology --db synthea.duckdb --store synthea.sqlite eval \
   --synthea --baseline eval/synthea-offline-baseline.json
 ```
 
-Set `ANTHROPIC_API_KEY` and `ANTHROPIC_MODEL` to use the [Claude Messages API](https://platform.claude.com/docs/en/api/messages/create). Run `propose` without an adapter flag, then review and publish. Use `query --live` with a natural-language question. Run `eval --synthea --live --output live-results.json` against a published Synthea ontology. Both live evaluation arms use the configured model and the same role-scoped data. Each question makes multiple billable calls across the four configurations.
+### Run the live Claude benchmark
+
+Create a workspace-scoped API key in the [Claude Console](https://platform.claude.com/settings/keys). In the repository root, create a local `.env` file with these two assignments.
+
+```sh
+ANTHROPIC_API_KEY=your_key_here
+ANTHROPIC_MODEL=claude-sonnet-4-6
+```
+
+Replace the placeholder and adjust the model ID if needed. Git ignores `.env`. In the same terminal, load it and run the benchmark against the published Synthea ontology.
+
+```sh
+set -a
+. ./.env
+set +a
+python -m ontology --db synthea.duckdb --store synthea.sqlite eval \
+  --synthea --live --output eval/synthea-live.json
+```
+
+The four configurations can make up to 160 billable model calls. The run prints progress by configuration and writes the report after all four finish. Both live arms use the configured model and share the same analyst-scoped data. Run `propose` without an adapter flag to generate a separate Claude-authored proposal for review. Use `query --live` for individual natural-language queries.
 
 ## Evaluation
 
