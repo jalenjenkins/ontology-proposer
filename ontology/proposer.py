@@ -109,3 +109,54 @@ def fixture_proposal(path):
     objects.append(dict(kind="metric", name="inflated_claim_cost", table="claims", key="id",
                         op="sum", column="cost", joins=[dict(table="claim_lines", left="id", right="claim")]))
     return [dict({"confidence": 0.9, "roles": ["analyst", "admin"], "evidence": []}, **item) for item in objects]
+
+
+def synthea_proposal(path):
+    """Reference proposal for the current SyntheticMass CSV export."""
+    data = profile(path)
+    tables = {
+        "patients": {"id", "city", "gender"},
+        "encounters": {"id", "patient", "encounterclass", "total_claim_cost"},
+        "claims": {"id", "patientid", "appointmentid", "status1"},
+        "claims_transactions": {"id", "claimid", "appointmentid", "type"},
+    }
+    index = {(item["table"], item["column"].lower()): item for item in data["columns"]}
+    roles = ["analyst", "admin"]
+
+    def build(kind, name, table, evidence, **definition):
+        return dict(kind=kind, name=name, table=table, evidence=evidence,
+                    roles=roles, confidence=0.9, **definition)
+
+    def actual(table, name):
+        return index[table, name]["column"]
+
+    result = []
+    for table, columns in tables.items():
+        result.append(build("entity", table, table, [index[table, "id"]], key=actual(table, "id")))
+        for column in sorted(columns):
+            evidence = index[table, column]
+            result.append(build("property", f"{table}.{column}", table,
+                                [evidence], column=evidence["column"]))
+    for evidence in data["joins"]:
+        table, target = evidence["source"], evidence["target"]
+        column, right = evidence["column"], evidence["target_column"]
+        if (table in tables and target in tables and column.lower() in tables[table]
+                and right.lower() == "id"):
+            result.append(build("join", f"{table}.{column}->{target}", table, [evidence],
+                                left=column, right=right, target=target))
+    for name, table, op, column in (
+        ("patient_count", "patients", "count", None),
+        ("encounter_count", "encounters", "count", None),
+        ("claim_count", "claims", "count", None),
+        ("encounter_claim_cost", "encounters", "sum", "total_claim_cost"),
+        ("average_encounter_claim_cost", "encounters", "avg", "total_claim_cost"),
+        ("inflated_encounter_claim_cost", "encounters", "sum", "total_claim_cost"),
+    ):
+        joins = []
+        if name.startswith("inflated"):
+            joins.append(dict(table="claims_transactions", left=actual(table, "id"),
+                              right=actual("claims_transactions", "appointmentid")))
+        evidence = [index[table, item] for item in ("id", column) if item]
+        result.append(build("metric", name, table, evidence, key=actual(table, "id"),
+                            op=op, column=actual(table, column) if column else None, joins=joins))
+    return result

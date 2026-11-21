@@ -1,0 +1,162 @@
+[
+  {
+    "id": "s01",
+    "question": "How many patients?",
+    "gold_sql": "SELECT COUNT(Id) FROM patients"
+  },
+  {
+    "id": "s02",
+    "question": "How many patients with city Boston?",
+    "gold_sql": "SELECT COUNT(Id) FROM patients WHERE CITY='Boston'"
+  },
+  {
+    "id": "s03",
+    "question": "How many patients with city Waltham?",
+    "gold_sql": "SELECT COUNT(Id) FROM patients WHERE CITY='Waltham'"
+  },
+  {
+    "id": "s04",
+    "question": "How many patients with city Plymouth?",
+    "gold_sql": "SELECT COUNT(Id) FROM patients WHERE CITY='Plymouth'"
+  },
+  {
+    "id": "s05",
+    "question": "How many patients with city Natick?",
+    "gold_sql": "SELECT COUNT(Id) FROM patients WHERE CITY='Natick'"
+  },
+  {
+    "id": "s06",
+    "question": "How many patients with gender F?",
+    "gold_sql": "SELECT COUNT(Id) FROM patients WHERE GENDER='F'"
+  },
+  {
+    "id": "s07",
+    "question": "How many patients with gender M?",
+    "gold_sql": "SELECT COUNT(Id) FROM patients WHERE GENDER='M'"
+  },
+  {
+    "id": "s08",
+    "question": "How many encounters?",
+    "gold_sql": "SELECT COUNT(Id) FROM encounters"
+  },
+  {
+    "id": "s09",
+    "question": "How many encounters with encounterclass wellness?",
+    "gold_sql": "SELECT COUNT(Id) FROM encounters WHERE ENCOUNTERCLASS='wellness'"
+  },
+  {
+    "id": "s10",
+    "question": "How many encounters with encounterclass ambulatory?",
+    "gold_sql": "SELECT COUNT(Id) FROM encounters WHERE ENCOUNTERCLASS='ambulatory'"
+  },
+  {
+    "id": "s11",
+    "question": "How many encounters with encounterclass emergency?",
+    "gold_sql": "SELECT COUNT(Id) FROM encounters WHERE ENCOUNTERCLASS='emergency'"
+  },
+  {
+    "id": "s12",
+    "question": "How many encounters with encounterclass inpatient?",
+    "gold_sql": "SELECT COUNT(Id) FROM encounters WHERE ENCOUNTERCLASS='inpatient'"
+  },
+  {
+    "id": "s13",
+    "question": "How many encounters with encounterclass outpatient?",
+    "gold_sql": "SELECT COUNT(Id) FROM encounters WHERE ENCOUNTERCLASS='outpatient'"
+  },
+  {
+    "id": "s14",
+    "question": "How many claims?",
+    "gold_sql": "SELECT COUNT(Id) FROM claims"
+  },
+  {
+    "id": "s15",
+    "question": "How many claims with status1 CLOSED?",
+    "gold_sql": "SELECT COUNT(Id) FROM claims WHERE STATUS1='CLOSED'"
+  },
+  {
+    "id": "s16",
+    "question": "How many claims with status1 BILLED?",
+    "gold_sql": "SELECT COUNT(Id) FROM claims WHERE STATUS1='BILLED'"
+  },
+  {
+    "id": "s17",
+    "question": "How many claims with status1 PENDING?",
+    "gold_sql": "SELECT COUNT(Id) FROM claims WHERE STATUS1='PENDING'"
+  },
+  {
+    "id": "s18",
+    "question": "What is the total encounter claim cost?",
+    "gold_sql": "SELECT SUM(TOTAL_CLAIM_COST) FROM encounters"
+  },
+  {
+    "id": "s19",
+    "question": "What is the total encounter claim cost with encounterclass wellness?",
+    "gold_sql": "SELECT SUM(TOTAL_CLAIM_COST) FROM encounters WHERE ENCOUNTERCLASS='wellness'"
+  },
+  {
+    "id": "s20",
+    "question": "What is the total encounter claim cost with encounterclass ambulatory?",
+    "gold_sql": "SELECT SUM(TOTAL_CLAIM_COST) FROM encounters WHERE ENCOUNTERCLASS='ambulatory'"
+  },
+  {
+    "id": "s21",
+    "question": "What is the total encounter claim cost with encounterclass emergency?",
+    "gold_sql": "SELECT SUM(TOTAL_CLAIM_COST) FROM encounters WHERE ENCOUNTERCLASS='emergency'"
+  },
+  {
+    "id": "s22",
+    "question": "What is the total encounter claim cost with encounterclass inpatient?",
+    "gold_sql": "SELECT SUM(TOTAL_CLAIM_COST) FROM encounters WHERE ENCOUNTERCLASS='inpatient'"
+  },
+  {
+    "id": "s23",
+    "question": "What is the total encounter claim cost with encounterclass outpatient?",
+    "gold_sql": "SELECT SUM(TOTAL_CLAIM_COST) FROM encounters WHERE ENCOUNTERCLASS='outpatient'"
+  },
+  {
+    "id": "s24",
+    "question": "What is the total encounter claim cost with encounterclass virtual?",
+    "gold_sql": "SELECT SUM(TOTAL_CLAIM_COST) FROM encounters WHERE ENCOUNTERCLASS='virtual'"
+  },
+  {
+    "id": "s25",
+    "question": "What is the total encounter claim cost with encounterclass home?",
+    "gold_sql": "SELECT SUM(TOTAL_CLAIM_COST) FROM encounters WHERE ENCOUNTERCLASS='home'"
+  },
+  {
+    "id": "s26",
+    "question": "What is the average encounter claim cost?",
+    "gold_sql": "SELECT AVG(TOTAL_CLAIM_COST) FROM encounters"
+  },
+  {
+    "id": "s27",
+    "question": "What is the average encounter claim cost with encounterclass wellness?",
+    "gold_sql": "SELECT AVG(TOTAL_CLAIM_COST) FROM encounters WHERE ENCOUNTERCLASS='wellness'"
+  },
+  {
+    "id": "s28",
+    "question": "What is the average encounter claim cost with encounterclass ambulatory?",
+    "gold_sql": "SELECT AVG(TOTAL_CLAIM_COST) FROM encounters WHERE ENCOUNTERCLASS='ambulatory'"
+  },
+  {
+    "id": "s29",
+    "question": "What is the average encounter claim cost with encounterclass emergency?",
+    "gold_sql": "SELECT AVG(TOTAL_CLAIM_COST) FROM encounters WHERE ENCOUNTERCLASS='emergency'"
+  },
+  {
+    "id": "s30",
+    "question": "What is the average encounter claim cost with encounterclass inpatient?",
+    "gold_sql": "SELECT AVG(TOTAL_CLAIM_COST) FROM encounters WHERE ENCOUNTERCLASS='inpatient'"
+  },
+  {
+    "id": "s31",
+    "question": "What is the average encounter claim cost with encounterclass urgentcare?",
+    "gold_sql": "SELECT AVG(TOTAL_CLAIM_COST) FROM encounters WHERE ENCOUNTERCLASS='urgentcare'"
+  },
+  {
+    "id": "s32",
+    "question": "What is the average encounter claim cost with encounterclass virtual?",
+    "gold_sql": "SELECT AVG(TOTAL_CLAIM_COST) FROM encounters WHERE ENCOUNTERCLASS='virtual'"
+  }
+]

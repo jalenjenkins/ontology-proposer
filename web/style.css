@@ -1,0 +1,22 @@
+:root { font-family: system-ui, sans-serif; color: #18262c; background: #eef3f1; }
+* { box-sizing: border-box; }
+main { width: min(850px, 94vw); margin: 50px auto; }
+header, .toolbar, .row, form, .actions { display: flex; align-items: center; gap: 12px; }
+header, .toolbar, .row { justify-content: space-between; }
+h1 { font-size: clamp(1.8rem, 5vw, 3rem); margin: 0; letter-spacing: -.05em; }
+.project, .kind, .meta { color: #4d625e; font-size: .85rem; }
+.project { letter-spacing: .12em; font-weight: 700; }
+.toolbar { margin: 25px 0 12px; }
+article { background: white; border: 1px solid #d4dfdc; border-radius: 12px; padding: 18px 22px; margin-bottom: 12px; }
+h2 { margin: 4px 0; font: 600 1rem ui-monospace, monospace; overflow-wrap: anywhere; }
+button, input { border: 1px solid #9faeaa; border-radius: 6px; padding: 7px 11px; background: white; color: inherit; font: inherit; }
+button { cursor: pointer; text-transform: capitalize; }
+button:disabled { opacity: .48; cursor: default; }
+.primary, button[aria-pressed=true] { background: #135c4b; color: white; }
+input { width: 74px; }
+.actions { justify-content: flex-end; margin-top: 12px; }
+.passed { color: #146047; }
+.blocked { color: #a42e2e; }
+summary { cursor: pointer; color: #37534d; }
+pre { overflow: auto; background: #eef3f1; padding: 12px; border-radius: 6px; }
+@media (max-width: 500px) { header { flex-wrap: wrap; } }

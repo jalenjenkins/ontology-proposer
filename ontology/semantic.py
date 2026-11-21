@@ -73,7 +73,7 @@ def validate(path, obj):
 
 def dependencies(obj):
     table = obj["table"]
-    fields = { (table, obj[k]) for k in ("key", "column", "left") if obj.get(k) }
+    fields = {(table, obj[k]) for k in ("key", "column", "left") if obj.get(k) }
     if obj.get("where"):
         fields.add((table, obj["where"]["column"]))
     if obj["kind"] == "join":
@@ -104,9 +104,10 @@ def scoped(path, objects):
             declarations = ", ".join(f"{ident(name)} {source_types[table, name]}" for name in names)
             target.execute(f"create table {ident(table)} ({declarations})")
             rows = source_db.execute(f"select {fields} from {ident(table)}")
-            while batch := rows.fetchmany(1000):
-                placeholders = ", ".join("?" for _ in names)
-                target.executemany(f"insert into {ident(table)} values ({placeholders})", batch)
+            vectors = ", ".join(f"unnest(?::{source_types[table, name]}[])" for name in names)
+            while batch := rows.fetchmany(4096):
+                target.execute(f"insert into {ident(table)} select {vectors}",
+                               [list(column) for column in zip(*batch)])
         yield target
 
 
