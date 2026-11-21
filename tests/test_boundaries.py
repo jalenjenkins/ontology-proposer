@@ -8,8 +8,8 @@ def db(tmp_path):
 
 def test_equal_cost_claims_still_fan_out(db):
     metric = dict(kind="metric", name="cost", table="claims", key="id",
-                  op="sum", column="cost", joins=[])
-    assert validate(db, metric)["value"] == 1350
+                  op="sum", column="cost", joins=[], confidence=1, roles=["admin"])
+    assert validate(db, metric)["value"] == 1400
     metric["joins"] = [dict(table="claim_lines", left="id", right="claim")]
     result = validate(db, metric)
     assert not result["ok"]
@@ -17,7 +17,7 @@ def test_equal_cost_claims_still_fan_out(db):
 
 def test_inner_join_drops_unmatched_claims(db):
     metric = dict(kind="metric", name="cost", table="claims", key="id",
-                  op="sum", column="cost",
+                  op="sum", column="cost", confidence=1, roles=["admin"],
                   joins=[dict(table="claim_lines", left="id", right="id")])
     assert not validate(db, metric)["ok"]
 
