@@ -1,0 +1,35 @@
+[
+  {
+    "id": "alpha-close",
+    "role": "analyst",
+    "dependencies": "structured_v1",
+    "plan": {
+      "metric": "fund_market_value",
+      "where": {"column": "snapshot_id", "value": "ALPHA/2026-10-31"}
+    }
+  },
+  {
+    "id": "alpha-previous-close",
+    "role": "analyst",
+    "dependencies": "structured_v1",
+    "plan": {
+      "metric": "fund_market_value",
+      "where": {"column": "snapshot_id", "value": "ALPHA/2026-10-30"}
+    }
+  },
+  {
+    "id": "beta-close",
+    "role": "admin",
+    "dependencies": "structured_v1",
+    "plan": {
+      "metric": "fund_market_value",
+      "where": {"column": "snapshot_id", "value": "BETA/2026-10-31"}
+    }
+  },
+  {
+    "id": "position-count",
+    "role": "analyst",
+    "dependencies": "structured_v1",
+    "plan": {"metric": "position_count"}
+  }
+]
