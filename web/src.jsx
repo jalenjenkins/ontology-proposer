@@ -164,6 +164,41 @@ function ChangeGate({batch, ready, busy, onCheck, onAcknowledge}) {
   </section>;
 }
 
+function ReviewOverview({batch, decided, approved, blocked}) {
+  const gate = batch.gate;
+  const findings = gate?.findings ?? [];
+  const example = findings.find(item => item.status === 'answer_changed' &&
+    typeof item.before === 'number' && typeof item.after === 'number' && item.before >= 0 && item.after >= 0);
+  const scale = example ? Math.max(example.before, example.after, 1) : 1;
+  return <section className="review-summary" aria-label="Live review summary" aria-live="polite">
+    <article className="review-glass">
+      <h2>Review progress</h2>
+      <div className="summary-number">{decided}<span> / {batch.changes.length}</span></div>
+      <progress value={decided} max={batch.changes.length || 1} aria-label="Changes reviewed"/>
+      <p>{approved} approved · {decided - approved} rejected · {blocked} blocked</p>
+    </article>
+    <article className="review-glass answer-summary">
+      <h2>Answer impact</h2>
+      {example ? <>
+        <p>{example.id} · {example.role}</p>
+        <dl className="answer-bars">{[['Current', example.before], ['Proposed', example.after]].map(([label, value]) =>
+          <div key={label}><dt>{label}</dt><dd>
+            <span className="bar-track" aria-hidden="true"><span style={{width: 100 * value / scale + '%'}}/></span>
+            <strong>{number.format(value)}</strong>
+          </dd></div>)}</dl>
+      </> : <p>{gate ? 'No comparable numeric answers changed.' : 'Run the gate to see how saved answers change.'}</p>}
+    </article>
+    <article className="review-glass release-summary">
+      <h2>Release check</h2>
+      <div className="summary-number">{gate ? gate.checked : '—'}{gate && <span> / {gate.cases}</span>}</div>
+      <p>{gate ? 'Saved plans replayed' : batch.parent ? 'Awaiting replay' : 'Initial publication'}</p>
+      {gate && <p className={gate.blocked ? 'release-blocked' : ''}>{gate.blocked ? 'Publication blocked' :
+        gate.acknowledged ? 'Answer changes acknowledged' :
+        findings.length ? 'Acknowledgement required' : 'Ready for publication'}</p>}
+    </article>
+  </section>;
+}
+
 function Review() {
   const [input, setInput] = useState(new URLSearchParams(location.search).get('batch') || '1');
   const [batch, setBatch] = useState(null);
@@ -248,22 +283,18 @@ function Review() {
       </form>
     </header>
     <main>
-      <section className="hero">
-        <div><p className="context">{batch ? 'Batch ' + batch.id + ' / Base version ' + batch.parent : 'Ontology versions'}</p>
-          <h1>Proposal review</h1></div>
-        <button className="primary publish" disabled={busy || published || !ready || !gateReady}
-          onClick={() => act(async () => {await api('publish', {batch: batch.id}); await load(batch.id);})}>
-          {published ? 'Version ' + batch.published + ' published' : 'Publish version'}
-        </button>
+      <section className="review-hero">
+        <div className="hero">
+          <div><p className="context">{batch ? 'Batch ' + batch.id + ' / Base version ' + batch.parent : 'Ontology versions'}</p>
+            <h1>Proposal review</h1></div>
+          <button className="primary publish" disabled={busy || published || !ready || !gateReady}
+            onClick={() => act(async () => {await api('publish', {batch: batch.id}); await load(batch.id);})}>
+            {published ? 'Version ' + batch.published + ' published' : 'Publish version'}
+          </button>
+        </div>
+        {batch && <ReviewOverview batch={batch} decided={decided} approved={approved} blocked={blocked}/>}
       </section>
       {error && <p role="alert" className="callout fail">{error}</p>}
-      {batch && <section className="overview" aria-label="Review progress">
-        <div className="overview-progress"><div><strong>{decided} of {changes.length}</strong> reviewed</div>
-          <progress value={decided} max={changes.length || 1} aria-label="Changes reviewed"/></div>
-        <div><strong>{approved}</strong><span> Approved</span></div>
-        <div><strong>{decided - approved}</strong><span> Rejected</span></div>
-        <div><strong>{blocked}</strong><span> Blocked</span></div>
-      </section>}
       {needsGate && <ChangeGate batch={batch} ready={ready} busy={busy}
         onCheck={() => act(async () => {await api('gate', {batch: batch.id}); await load(batch.id);})}
         onAcknowledge={key => act(async () => {await api('gate/acknowledge', {batch: batch.id, key}); await load(batch.id);})}/>}
