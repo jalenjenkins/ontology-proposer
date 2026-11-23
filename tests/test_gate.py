@@ -96,3 +96,37 @@ def test_suite_edit_invalidates_gate_evidence(release):
         store.publish(batch, path, suite)
     assert store.check_gate(batch, path, suite)["checked"] == len(cases)
     assert store.publish(batch, path, suite) == 2
+
+
+def test_unreferenced_grant_blocks_publish_and_redacts_field(release):
+    store, path, suite, _ = release
+    prop = next(obj for obj in store.snapshot() if obj["name"] == "patients.private_note")
+    alias = dict(prop, name="new_alias", column="PRIVATE_NOTE", roles=["analyst"])
+    batch = stage(store, path, [alias])
+    report = store.check_gate(batch, path, suite)
+    assert report["checked"] == 0 and report["findings"] == []
+    assert report["permission_changes"] == [dict(role="analyst", grants=1, revocations=0)]
+    assert "private_note" not in json.dumps(report).lower()
+    with pytest.raises(ValueError, match="blocked"):
+        store.publish(batch, path, suite)
+
+
+@pytest.mark.parametrize("variant", range(12))
+def test_generated_targeted_replay_matches_full(release, variant):
+    store, path, _, cases = release
+    before = store.snapshot()
+    changes = [
+        dict(op="avg"),
+        dict(roles=["admin"]),
+        dict(joins=[dict(table="patients", left="patient", right="id")]),
+        dict(description="Documentation only"),
+    ]
+    update = changes[variant % len(changes)]
+    after = [dict(obj, **update) if obj["name"] == "claim_cost" else obj for obj in before]
+    if variant % 3 == 0:
+        cases[variant % len(cases)].pop("dependencies")
+    report = compare_replays(path, before, after, cases)
+    assert report["missed"] == []
+    assert report["targeted"]["blocked"] == report["full"]["blocked"]
+    assert report["targeted"]["permission_changes"] == report["full"]["permission_changes"]
+    assert report["targeted"]["checked"] <= len(cases)

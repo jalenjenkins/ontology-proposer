@@ -129,13 +129,18 @@ Run `python -m ontology --db synthea.duckdb gate-compare`. The [saved local resu
 | --- | ---: | ---: | ---: |
 | Cost definition | 3 | 12 | 0 |
 | Analyst visibility | 1 | 12 | 0 |
+| Unreferenced permission grant | 0 | 12 | 0 |
 | Description only | 0 | 12 | 0 |
 | Missing dependency metadata | 12 | 12 | 0 |
 | Fan-out join | 3 | 12 | 0 |
 
-The cost proposal switches from total claim cost to base encounter cost. The analyst total changes from 23,594,852.52 to 783,313.82 even though the proposed sum preserves encounter grain. The permissions proposal removes analyst visibility of the city property. The saved analyst plan changes from allowed to denied, while the corresponding admin plan still works.
+The cost proposal switches from total claim cost to base encounter cost. The analyst total changes from 23,594,852.52 to 783,313.82 even though the proposed sum preserves encounter grain. The permissions proposal removes analyst visibility of the city property. The saved analyst plan changes from allowed to denied, while the corresponding admin plan still works. The unreferenced grant proposes analyst access to a previously admin-only field. It is blocked with zero saved-plan executions. To stage it, use `gate-demo unreferenced_grant` with a fresh review store.
 
-The targeted path compares the executable metric shape and effective role permissions before running SQL. Unknown dependency metadata triggers full replay. Publication binds the report to the parent, candidate, source file content, suite, and gate policy version. It rejects stale evidence, failed invariants, and access changes. Acknowledgements apply to a specific report. This is a deterministic gate for registered plans. Its coverage depends on what the suite contains. The cost and fan-out cases still opened projections for both roles, which dominated their wall time in this run.
+Run `PYTHON=.venv/bin/python sh scripts/check-gate.sh synthea.duckdb` for a keyless summary after installing the requirements and importing the pinned Synthea sample. CI runs the fixture tests without needing a Synthea download, Claude credentials, or a network service at test time.
+
+The independent policy check compares each role’s effective access to existing ontology objects and registered source columns. It matches physical columns by table and column even when an alias is added, and reports counts without field names. A new registration for a previously unregistered source column still requires an explicit object approval. Replay remains useful for downstream effects on saved plans.
+
+The targeted path compares the executable metric shape and effective role permissions before running SQL. Unknown dependency metadata triggers full replay. Publication binds the report to the parent, candidate, source file content, suite, and gate policy version. It rejects stale evidence, failed invariants, and access changes. Acknowledgements apply to a specific report. This is a deterministic gate for registered plans. Its coverage depends on what the suite contains. The cost and fan-out cases still opened projections for both roles, which dominated their wall time in this run. The JSON comparison separates time opening projections from time executing queries.
 
 ## Local execution
 

@@ -52,7 +52,7 @@ def main():
     action.add_argument("--full", action="store_true")
     action.add_argument("--acknowledge", metavar="EVIDENCE_KEY")
     gate_demo = commands.add_parser("gate-demo")
-    gate_demo.add_argument("scenario", choices=("cost", "permissions"))
+    gate_demo.add_argument("scenario", choices=("cost", "permissions", "unreferenced_grant"))
     commands.add_parser("gate-compare")
     args = parser.parse_args()
     cmd = args.command

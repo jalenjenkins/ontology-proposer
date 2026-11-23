@@ -142,6 +142,11 @@ function ChangeGate({batch, ready, busy, onCheck, onAcknowledge}) {
       {!batch.published && <button className="secondary" disabled={busy || !ready} onClick={onCheck}>Run gate</button>}
     </div>
     {report && <>
+      {report.permission_changes?.length > 0 && <ul className="gate-meta" aria-label="Effective permission changes">
+        {report.permission_changes.map(change => <li key={change.role}>
+          {change.role} · {change.grants} grants · {change.revocations} revocations
+        </li>)}
+      </ul>}
       <p className="gate-meta">{report.checked} of {report.cases} plans replayed · {report.mode === 'fallback' ? 'Full replay due to incomplete dependencies' : report.mode}</p>
       {report.failed_invariants.length > 0 && <p className="gate-meta">Failed validation: {report.failed_invariants.map(x => x.name).join(', ')}</p>}
       {report.findings.length > 0 && <table className="gate-table">

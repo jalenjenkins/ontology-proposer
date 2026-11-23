@@ -68,9 +68,29 @@ def execution_signature(objects, plan):
     return {key: metric[key] for key in ("table", "op", "column", "joins", "where") if key in metric}
 
 
+def permission_changes(before, after):
+    """Report changes to existing access without exposing object identities."""
+    def identity(obj):
+        if obj["kind"] == "property":
+            return ("property", obj["table"].lower(), obj["column"].lower())
+        return obj["kind"], obj["name"]
+
+    known = {identity(obj) for obj in before}
+    roles = sorted({role for snapshot in (before, after) for obj in snapshot for role in obj["roles"]})
+    changes = []
+    for role in roles:
+        current = {identity(obj) for obj in visible(before, role)} & known
+        proposed = {identity(obj) for obj in visible(after, role)} & known
+        grants, revocations = len(proposed - current), len(current - proposed)
+        if grants or revocations:
+            changes.append(dict(role=role, grants=grants, revocations=revocations))
+    return changes
+
+
 def replay(path, before, after, cases, *, full=False):
     started = perf_counter()
     roles = {case["role"] for case in cases}
+    access_changes = permission_changes(before, after)
     views = [{role: visible(snapshot, role) for role in roles} for snapshot in (before, after)]
     fallback = any(case.get("dependencies") != "structured_v1" for case in cases)
     selected = list(cases) if full or fallback else [
@@ -81,18 +101,28 @@ def replay(path, before, after, cases, *, full=False):
     invariants = [dict(kind=obj["kind"], name=obj["name"]) for obj in after
                   if obj != old_objects.get((obj["kind"], obj["name"])) and not validate(path, obj)["ok"]]
     findings = []
+    projection_ms = query_ms = 0
     with ExitStack() as stack:
         sessions = {}
 
         def execute(index, case):
+            nonlocal projection_ms, query_ms
             role, plan = case["role"], case["plan"]
             objects = views[index][role]
             if execution_signature(objects, plan) is None:
                 return "denied", None
             try:
                 if (index, role) not in sessions:
-                    sessions[index, role] = stack.enter_context(scoped(path, objects))
-                result = execute_plan(sessions[index, role], objects, plan)
+                    started_projection = perf_counter()
+                    try:
+                        sessions[index, role] = stack.enter_context(scoped(path, objects))
+                    finally:
+                        projection_ms += (perf_counter() - started_projection) * 1000
+                started_query = perf_counter()
+                try:
+                    result = execute_plan(sessions[index, role], objects, plan)
+                finally:
+                    query_ms += (perf_counter() - started_query) * 1000
                 return result["status"], result.get("value")
             except (KeyError, ValueError, TypeError, duckdb.Error):
                 return "error", None
@@ -112,7 +142,9 @@ def replay(path, before, after, cases, *, full=False):
                                      before=old[1], after=new[1]))
     return dict(mode="full" if full else ("fallback" if fallback else "targeted"),
                 cases=len(cases), checked=len(selected), elapsed_ms=round((perf_counter()-started)*1000, 2),
-                blocked=bool(invariants) or any(row["status"] != "answer_changed" for row in findings),
+                projection_ms=round(projection_ms, 2), query_ms=round(query_ms, 2),
+                permission_changes=access_changes,
+                blocked=bool(invariants or access_changes) or any(row["status"] != "answer_changed" for row in findings),
                 failed_invariants=invariants, findings=findings)
 
 

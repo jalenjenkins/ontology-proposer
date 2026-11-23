@@ -4,7 +4,10 @@
       "mode": "targeted",
       "cases": 12,
       "checked": 3,
-      "elapsed_ms": 2096.91,
+      "elapsed_ms": 3059.83,
+      "projection_ms": 2896.06,
+      "query_ms": 23.21,
+      "permission_changes": [],
       "blocked": false,
       "failed_invariants": [],
       "findings": [
@@ -38,7 +41,10 @@
       "mode": "full",
       "cases": 12,
       "checked": 12,
-      "elapsed_ms": 2068.31,
+      "elapsed_ms": 3036.05,
+      "projection_ms": 2713.45,
+      "query_ms": 25.64,
+      "permission_changes": [],
       "blocked": false,
       "failed_invariants": [],
       "findings": [
@@ -75,7 +81,16 @@
       "mode": "targeted",
       "cases": 12,
       "checked": 1,
-      "elapsed_ms": 498.44,
+      "elapsed_ms": 629.44,
+      "projection_ms": 595.16,
+      "query_ms": 1.59,
+      "permission_changes": [
+        {
+          "role": "analyst",
+          "grants": 0,
+          "revocations": 1
+        }
+      ],
       "blocked": true,
       "failed_invariants": [],
       "findings": [
@@ -92,7 +107,16 @@
       "mode": "full",
       "cases": 12,
       "checked": 12,
-      "elapsed_ms": 2001.86,
+      "elapsed_ms": 2578.96,
+      "projection_ms": 2509.41,
+      "query_ms": 23.53,
+      "permission_changes": [
+        {
+          "role": "analyst",
+          "grants": 0,
+          "revocations": 1
+        }
+      ],
       "blocked": true,
       "failed_invariants": [],
       "findings": [
@@ -107,12 +131,54 @@
     },
     "missed": []
   },
+  "unreferenced_grant": {
+    "targeted": {
+      "mode": "targeted",
+      "cases": 12,
+      "checked": 0,
+      "elapsed_ms": 27.47,
+      "projection_ms": 0,
+      "query_ms": 0,
+      "permission_changes": [
+        {
+          "role": "analyst",
+          "grants": 1,
+          "revocations": 0
+        }
+      ],
+      "blocked": true,
+      "failed_invariants": [],
+      "findings": []
+    },
+    "full": {
+      "mode": "full",
+      "cases": 12,
+      "checked": 12,
+      "elapsed_ms": 2518.62,
+      "projection_ms": 2447.15,
+      "query_ms": 25.37,
+      "permission_changes": [
+        {
+          "role": "analyst",
+          "grants": 1,
+          "revocations": 0
+        }
+      ],
+      "blocked": true,
+      "failed_invariants": [],
+      "findings": []
+    },
+    "missed": []
+  },
   "harmless": {
     "targeted": {
       "mode": "targeted",
       "cases": 12,
       "checked": 0,
-      "elapsed_ms": 32.21,
+      "elapsed_ms": 34.26,
+      "projection_ms": 0,
+      "query_ms": 0,
+      "permission_changes": [],
       "blocked": false,
       "failed_invariants": [],
       "findings": []
@@ -121,7 +187,10 @@
       "mode": "full",
       "cases": 12,
       "checked": 12,
-      "elapsed_ms": 1984.76,
+      "elapsed_ms": 2144.0,
+      "projection_ms": 2072.96,
+      "query_ms": 23.55,
+      "permission_changes": [],
       "blocked": false,
       "failed_invariants": [],
       "findings": []
@@ -133,7 +202,10 @@
       "mode": "fallback",
       "cases": 12,
       "checked": 12,
-      "elapsed_ms": 2120.37,
+      "elapsed_ms": 2369.07,
+      "projection_ms": 2290.03,
+      "query_ms": 25.38,
+      "permission_changes": [],
       "blocked": false,
       "failed_invariants": [],
       "findings": [
@@ -167,7 +239,10 @@
       "mode": "full",
       "cases": 12,
       "checked": 12,
-      "elapsed_ms": 2095.39,
+      "elapsed_ms": 2156.32,
+      "projection_ms": 2079.29,
+      "query_ms": 25.83,
+      "permission_changes": [],
       "blocked": false,
       "failed_invariants": [],
       "findings": [
@@ -204,7 +279,10 @@
       "mode": "targeted",
       "cases": 12,
       "checked": 3,
-      "elapsed_ms": 2061.6,
+      "elapsed_ms": 2396.52,
+      "projection_ms": 2280.19,
+      "query_ms": 36.92,
+      "permission_changes": [],
       "blocked": true,
       "failed_invariants": [
         {
@@ -243,7 +321,10 @@
       "mode": "full",
       "cases": 12,
       "checked": 12,
-      "elapsed_ms": 2118.58,
+      "elapsed_ms": 2433.38,
+      "projection_ms": 2284.25,
+      "query_ms": 57.12,
+      "permission_changes": [],
       "blocked": true,
       "failed_invariants": [
         {

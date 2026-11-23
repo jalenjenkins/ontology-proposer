@@ -134,7 +134,7 @@ class Store:
 
     @staticmethod
     def _evidence_key(parent, candidate, source, suite):
-        return digest(["gate-v1", parent, candidate, source, suite])
+        return digest(["gate-v2", parent, candidate, source, suite])
 
     def check_gate(self, batch, path, suite_path, full=False):
         if not suite_path:

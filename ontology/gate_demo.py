@@ -10,6 +10,8 @@ SUITE = Path(__file__).resolve().parent.parent / "eval" / "synthea-gate-cases.js
 def proposal(path, baseline, scenario):
     by_name = {obj["name"]: obj for obj in baseline}
     metric = by_name["encounter_claim_cost"]
+    if scenario == "unreferenced_grant":
+        return [dict(by_name["patients.birthdate"], roles=["analyst", "admin"])]
     if scenario == "permissions":
         return [dict(by_name["patients.city"], roles=["admin"])]
     if scenario == "harmless":
@@ -25,9 +27,17 @@ def proposal(path, baseline, scenario):
     return [property_, dict(metric, column=column, description="Use the base encounter charge")]
 
 
+def reference(path):
+    with open_db(path, True) as db:
+        column = next(c for t, c, _ in catalog(db) if t == "patients" and c.lower() == "birthdate")
+    restricted = dict(kind="property", name="patients.birthdate", table="patients", column=column,
+                      confidence=1, roles=["admin"], evidence=[])
+    return synthea_proposal(path) + [restricted]
+
+
 def stage_demo(path, store, scenario):
     if not store.snapshot():
-        batch = store.stage(path, synthea_proposal(path))
+        batch = store.stage(path, reference(path))
         for change in store.changes(batch):
             store.decide(change["id"], "approve" if change["validation"]["ok"] else "reject")
         store.publish(batch)
@@ -38,10 +48,10 @@ def stage_demo(path, store, scenario):
 def compare_demo(path):
     cases = load_suite(SUITE)
     with pinned_source(path):
-        initial = synthea_proposal(path)
+        initial = reference(path)
         baseline = [obj for obj in initial if not obj["name"].startswith("inflated_")]
         reports = {}
-        for scenario in ("cost", "permissions", "harmless", "untracked", "fanout"):
+        for scenario in ("cost", "permissions", "unreferenced_grant", "harmless", "untracked", "fanout"):
             updated = {obj["name"]: obj for obj in baseline}
             if scenario == "fanout":
                 bad = next(obj for obj in initial if obj["name"].startswith("inflated_"))
