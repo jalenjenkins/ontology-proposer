@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {createRoot} from 'react-dom/client';
 import './style.css';
 
@@ -204,6 +204,15 @@ function ReviewOverview({batch, decided, approved, blocked}) {
   </section>;
 }
 
+function LoadingPreview() {
+  return <div aria-hidden="true">
+    <div className="review-summary">
+      {['Review progress', 'Answer impact', 'Release check'].map(label =>
+        <div className="review-glass" key={label}><h2>{label}</h2><span className="skeleton"/></div>)}
+    </div>
+  </div>;
+}
+
 function Review() {
   const [input, setInput] = useState(new URLSearchParams(location.search).get('batch') || '1');
   const [batch, setBatch] = useState(null);
@@ -211,7 +220,9 @@ function Review() {
   const [filter, setFilter] = useState('All');
   const [search, setSearch] = useState('');
   const [error, setError] = useState('');
-  const [busy, setBusy] = useState(true);
+  const [activity, setActivity] = useState('Loading batch…');
+  const inFlight = useRef(false);
+  const busy = Boolean(activity);
 
   async function load(id) {
     const data = await api('review/' + encodeURIComponent(id));
@@ -220,13 +231,22 @@ function Review() {
   }
 
   useEffect(() => {
-    load(input).catch(e => setError(e.message)).finally(() => setBusy(false));
+    act(() => load(input), 'Loading batch…');
   }, []);
 
-  async function act(fn) {
-    setBusy(true);
+  async function act(fn, label = 'Saving decision…') {
+    if (inFlight.current) return;
+    inFlight.current = true;
+    setActivity(label);
     setError('');
-    try { await fn(); } catch (e) { setError(e.message); } finally { setBusy(false); }
+    try {
+      await fn();
+    } catch (error) {
+      setError(error.message);
+    } finally {
+      inFlight.current = false;
+      setActivity('');
+    }
   }
 
   const changes = batch?.changes ?? [];
@@ -281,9 +301,9 @@ function Review() {
         const data = await load(input);
         setFilter('All'); setSearch(''); setSelected(null);
         history.replaceState(null, '', '?batch=' + data.id);
-      });}}>
+      }, 'Loading batch…');}}>
         <label htmlFor="batch">Batch</label>
-        <input id="batch" type="number" min="1" required value={input} onChange={e => setInput(e.target.value)}/>
+        <input id="batch" type="number" min="1" required disabled={busy} value={input} onChange={e => setInput(e.target.value)}/>
         <button className="secondary" disabled={busy}>Load</button>
       </form>
     </header>
@@ -294,7 +314,7 @@ function Review() {
             <h1>Proposal review</h1></div>
           <div className="publish-actions">
           <button className="primary publish" disabled={busy || published || !ready || !gateReady}
-            onClick={() => act(async () => {await api('publish', {batch: batch.id}); await load(batch.id);})}>
+            onClick={() => act(async () => {await api('publish', {batch: batch.id}); await load(batch.id);}, 'Publishing version…')}>
             {published ? 'Version ' + batch.published + ' published' : 'Publish version'}
           </button>
           {batch && !published && (!ready || !gateReady) && <p className="publish-hint">
@@ -303,13 +323,14 @@ function Review() {
           </p>}
           </div>
         </div>
-        {batch && <ReviewOverview batch={batch} decided={decided} approved={approved} blocked={blocked}/>}
+        {batch ? <ReviewOverview batch={batch} decided={decided} approved={approved} blocked={blocked}/> : busy && <LoadingPreview/>}
       </section>
+      <p className="activity-status" role="status">{activity}</p>
       {error && <p role="alert" className="callout fail">{error}</p>}
       {needsGate && <ChangeGate batch={batch} ready={ready} busy={busy}
-        onCheck={() => act(async () => {await api('gate', {batch: batch.id}); await load(batch.id);})}
-        onAcknowledge={key => act(async () => {await api('gate/acknowledge', {batch: batch.id, key}); await load(batch.id);})}/>}
-      <div className="workspace">
+        onCheck={() => act(async () => {await api('gate', {batch: batch.id}); await load(batch.id);}, 'Replaying saved plans…')}
+        onAcknowledge={key => act(async () => {await api('gate/acknowledge', {batch: batch.id, key}); await load(batch.id);}, 'Saving acknowledgement…')}/>}
+      <div className="workspace" aria-busy={busy}>
         <section className="queue" aria-label="Change queue">
           <div className="queue-head">
             <h2>Changes <span>{hits.length}</span></h2>
@@ -334,11 +355,13 @@ function Review() {
             </table>
           </div>
           {hits.length > 0 && <div className="queue-shortcuts"><kbd>J</kbd> next <kbd>K</kbd> previous</div>}
-          {!hits.length && <p className="empty">{busy && !batch ? 'Loading changes…' : 'No matching changes.'}</p>}
+          {!hits.length && (busy && !batch
+            ? <div className="loading-queue" aria-hidden="true"><span className="skeleton"/><span className="skeleton"/><span className="skeleton"/></div>
+            : <p className="empty">{batch ? 'No matching changes.' : 'Load a batch to see its changes.'}</p>)}
         </section>
         {current ? <Inspector key={current.id} change={current} busy={busy} published={published}
           onDecide={decide}/>
-          : <div className="inspector empty">Select a change to inspect its evidence.</div>}
+          : <div className="inspector empty">{busy && !batch ? <span className="skeleton" aria-hidden="true"/> : 'Select a change to inspect its evidence.'}</div>}
       </div>
     </main>
   </>;

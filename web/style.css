@@ -257,3 +257,13 @@ pre { color: #e9eddf; background: #2d342a; border-radius: 2px; }
   .review-hero .hero { align-items: flex-start; }
   .publish-hint { font-size: 10px; }
 }
+
+.review-hero { border-radius: 18px; }
+.review-glass { border-radius: 13px; }
+.queue, .inspector, .change-gate { border-radius: 11px; }
+.primary, .secondary, input, select { border-radius: 6px; }
+.badge, .object-mark { border-radius: 5px; }
+.activity-status { min-height: 18px; color: var(--muted); font-size: 12px; margin: -5px 1px 7px; }
+.skeleton { display: block; height: 12px; width: 67%; margin-block: 10px; border-radius: 5px; background: #e0ebe7; }
+.review-glass > .skeleton { height: 26px; margin-bottom: 14px; }
+.loading-queue { padding: 7px 15px; }
