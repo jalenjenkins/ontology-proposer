@@ -4,6 +4,8 @@ A local review and release gate for the business definitions an AI analyst uses 
 
 **No API key is required for the investment demo.** A proposed edit swaps market value for historical purchase cost. The SQL runs and the row counts pass. The gate holds publication because the answer for Fund Alpha changes from **$14M to $11M**.
 
+[Watch the investment release gate demo](demo/ontology-investment-gate.mp4)
+
 ## Run locally
 
 Requires **Python 3.11+**. Node.js is needed only for the React reviewer.
