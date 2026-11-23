@@ -236,3 +236,24 @@ pre { color: #e9eddf; background: #2d342a; border-radius: 2px; }
   .review-hero { padding: 10px; }
   .review-glass { padding: 8px; }
 }
+
+/* Use proportional type for decisions and monospace for exact identifiers and values. */
+:root {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --mono: 'SF Mono', 'Cascadia Mono', Consolas, monospace;
+}
+.context { text-transform: none; letter-spacing: .015em; font-family: inherit; font-size: 12px; font-weight: 600; line-height: 1.4; }
+.review-hero h1 { line-height: 1.13; }
+.publish-actions { text-align: right; }
+.publish-hint { margin-top: 4px; max-width: 24ch; line-height: 1.35; font-size: 11px; color: #3d5357; }
+.summary-number, .answer-bars strong { font-variant-numeric: tabular-nums; }
+.inspector h2 { font: 650 clamp(18px, 2.25vw, 26px)/1.22 -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; letter-spacing: -.03em; margin-bottom: 4px; }
+.technical-id { margin-bottom: 11px; color: var(--muted); font: 11px/1.5 var(--mono); overflow-wrap: anywhere; }
+.row-info strong { font: 620 13px/1.35 -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+.row-info small, .object-type { text-transform: none; }
+.gate-table th, .gate-table td { padding-block: 8px; }
+.queue-head input:focus-visible, .filter select:focus-visible { outline-offset: 1px; }
+@media (max-width: 440px) {
+  .review-hero .hero { align-items: flex-start; }
+  .publish-hint { font-size: 10px; }
+}

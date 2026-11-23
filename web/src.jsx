@@ -15,6 +15,11 @@ const number = new Intl.NumberFormat();
 const status = change => change.decision === 'approve' ? 'Approved' :
   change.decision === 'reject' ? 'Rejected' : change.validation.ok ? 'Pending' : 'Blocked';
 
+function displayLabel(identifier) {
+  const label = identifier.replace(/[._-]+/g, ' ');
+  return label.charAt(0).toUpperCase() + label.slice(1);
+}
+
 function ObjectMark({kind}) {
   return <span className={'object-mark ' + kind} aria-hidden="true">{marks[kind] ?? '◇'}</span>;
 }
@@ -80,7 +85,7 @@ function Inspector({change, onDecide, busy, published}) {
   return <section className="inspector" aria-label="Change details">
     <div className="inspector-head">
       <div className="object-line"><ObjectMark kind={after.kind}/><div className="object-type">{before ? 'Update' : 'Add'} {after.kind}</div></div>
-      <h2>{after.name}</h2>
+      <h2>{displayLabel(after.name)}</h2><p className="technical-id"><code>{after.name}</code></p>
       {after.description && <p className="description">{after.description}</p>}
       <dl className="metadata">
         <div><dt>Source table</dt><dd>{after.table}</dd></div>
@@ -152,7 +157,7 @@ function ChangeGate({batch, ready, busy, onCheck, onAcknowledge}) {
       {report.findings.length > 0 && <table className="gate-table">
         <thead><tr><th scope="col">Saved plan</th><th scope="col">Role</th><th scope="col">Current</th><th scope="col">Proposed</th><th scope="col">Finding</th></tr></thead>
         <tbody>{report.findings.map(row => <tr key={row.id}>
-          <th scope="row">{row.id}</th><td>{row.role}</td>
+          <th scope="row" title={row.id}>{displayLabel(row.id)}</th><td>{displayLabel(row.role)}</td>
           <td>{typeof row.before === 'number' ? number.format(row.before) : row.before ?? '—'}</td>
           <td>{typeof row.after === 'number' ? number.format(row.after) : row.after ?? '—'}</td>
           <td>{row.status === 'answer_changed' ? 'Answer changed' : row.status === 'access_changed' ? 'Access changed' : 'Execution error'}</td>
@@ -180,7 +185,7 @@ function ReviewOverview({batch, decided, approved, blocked}) {
     <article className="review-glass answer-summary">
       <h2>Answer impact</h2>
       {example ? <>
-        <p>{example.id} · {example.role}</p>
+        <p>{displayLabel(example.id)} · {displayLabel(example.role)}</p>
         <dl className="answer-bars">{[['Current', example.before], ['Proposed', example.after]].map(([label, value]) =>
           <div key={label}><dt>{label}</dt><dd>
             <span className="bar-track" aria-hidden="true"><span style={{width: 100 * value / scale + '%'}}/></span>
@@ -285,12 +290,18 @@ function Review() {
     <main>
       <section className="review-hero">
         <div className="hero">
-          <div><p className="context">{batch ? 'Batch ' + batch.id + ' / Base version ' + batch.parent : 'Ontology versions'}</p>
+          <div><p className="context">{batch ? 'Batch ' + batch.id + ' · Base version ' + batch.parent : 'Ontology versions'}</p>
             <h1>Proposal review</h1></div>
+          <div className="publish-actions">
           <button className="primary publish" disabled={busy || published || !ready || !gateReady}
             onClick={() => act(async () => {await api('publish', {batch: batch.id}); await load(batch.id);})}>
             {published ? 'Version ' + batch.published + ' published' : 'Publish version'}
           </button>
+          {batch && !published && (!ready || !gateReady) && <p className="publish-hint">
+            {!ready ? 'Review every change and approve at least one.' : !gate ? 'Run the change gate first.' :
+              gate.blocked ? 'Resolve the release blockers.' : 'Acknowledge the changed answers.'}
+          </p>}
+          </div>
         </div>
         {batch && <ReviewOverview batch={batch} decided={decided} approved={approved} blocked={blocked}/>}
       </section>
@@ -315,7 +326,7 @@ function Review() {
                 {group.changes.map(c => <tr key={c.id} className={c.id === current?.id ? 'active' : ''}>
                   <td><button id={'change-' + c.id} className="queue-row" aria-current={c.id === current?.id}
                     onClick={e => {setSelected(c.id); if (e.detail) e.currentTarget.blur();}}>
-                    <ObjectMark kind={c.after.kind}/><span className="row-info"><strong>{c.after.name}</strong><small>{c.after.kind}</small></span>
+                    <ObjectMark kind={c.after.kind}/><span className="row-info"><strong title={c.after.name}>{displayLabel(c.after.name)}</strong><small>{displayLabel(c.after.kind)}</small></span>
                   </button></td>
                   <td><span className={'badge ' + status(c).toLowerCase()}>{status(c)}</span></td>
                 </tr>)}
